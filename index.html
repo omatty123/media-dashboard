@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #e4e4e4;
+            padding: 2rem;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            color: #fff;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .category {
+            margin-bottom: 2.5rem;
+        }
+
+        .category h2 {
+            font-size: 1.3rem;
+            color: #a4b0be;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 1.25rem;
+            text-decoration: none;
+            color: #fff;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .card:hover {
+            background: rgba(255,255,255,0.12);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border-color: rgba(255,255,255,0.2);
+        }
+
+        .card .name {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .card .url {
+            font-size: 0.75rem;
+            color: #7f8c8d;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .card .tag {
+            display: inline-block;
+            background: rgba(99, 110, 255, 0.3);
+            color: #a0a8ff;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            margin-top: 0.5rem;
+            width: fit-content;
+        }
+
+        .card .tag.general { background: rgba(255, 159, 67, 0.3); color: #ffb347; }
+        .card .tag.asian { background: rgba(236, 72, 153, 0.3); color: #f472b6; }
+        .card .tag.video { background: rgba(34, 197, 94, 0.3); color: #4ade80; }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            color: #7f8c8d;
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 600px) {
+            body { padding: 1rem; }
+            h1 { font-size: 1.8rem; }
+            .grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <h1>Media Dashboard</h1>
+
+    <div class="category">
+        <h2>Asian Drama & K-Drama</h2>
+        <div class="grid">
+            <a href="https://asiaflix.net/" target="_blank" class="card">
+                <span class="name">Asiaflix</span>
+                <span class="url">asiaflix.net</span>
+                <span class="tag asian">K-Drama</span>
+            </a>
+            <a href="https://kissasian.org.za/" target="_blank" class="card">
+                <span class="name">KissAsian</span>
+                <span class="url">kissasian.org.za</span>
+                <span class="tag asian">Asian Drama</span>
+            </a>
+            <a href="https://kissasiantv.la/" target="_blank" class="card">
+                <span class="name">KissAsian TV</span>
+                <span class="url">kissasiantv.la</span>
+                <span class="tag asian">Asian Drama</span>
+            </a>
+            <a href="https://www.watchasiann.de/" target="_blank" class="card">
+                <span class="name">WatchAsian</span>
+                <span class="url">watchasiann.de</span>
+                <span class="tag asian">Asian Drama</span>
+            </a>
+            <a href="https://ww5.myasiantv.rest/" target="_blank" class="card">
+                <span class="name">MyAsianTV</span>
+                <span class="url">myasiantv.rest</span>
+                <span class="tag asian">Asian Drama</span>
+            </a>
+            <a href="https://dramacool9.com.ro/" target="_blank" class="card">
+                <span class="name">Dramacool</span>
+                <span class="url">dramacool9.com.ro</span>
+                <span class="tag asian">K-Drama</span>
+            </a>
+            <a href="https://kisskh.co/" target="_blank" class="card">
+                <span class="name">KissKH</span>
+                <span class="url">kisskh.co</span>
+                <span class="tag asian">Asian Drama</span>
+            </a>
+            <a href="https://goplay.su/" target="_blank" class="card">
+                <span class="name">GoPlay</span>
+                <span class="url">goplay.su</span>
+                <span class="tag asian">K-Drama</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="category">
+        <h2>Movies & TV Shows</h2>
+        <div class="grid">
+            <a href="https://rivestream.org/" target="_blank" class="card">
+                <span class="name">Rive</span>
+                <span class="url">rivestream.org</span>
+                <span class="tag general">Movies & TV</span>
+            </a>
+            <a href="https://flixmomo.org/" target="_blank" class="card">
+                <span class="name">Flixmomo</span>
+                <span class="url">flixmomo.org</span>
+                <span class="tag general">Movies & TV</span>
+            </a>
+            <a href="https://bingeflix.tv/" target="_blank" class="card">
+                <span class="name">Bingeflix</span>
+                <span class="url">bingeflix.tv</span>
+                <span class="tag general">Movies & TV</span>
+            </a>
+            <a href="https://bingeflex.vercel.app/" target="_blank" class="card">
+                <span class="name">Bingeflex</span>
+                <span class="url">bingeflex.vercel.app</span>
+                <span class="tag general">Movies & TV</span>
+            </a>
+            <a href="https://primeflix-vercel.com/" target="_blank" class="card">
+                <span class="name">PrimeFlix</span>
+                <span class="url">primeflix-vercel.com</span>
+                <span class="tag general">Movies & TV</span>
+            </a>
+            <a href="https://xprime.today/" target="_blank" class="card">
+                <span class="name">xPrime</span>
+                <span class="url">xprime.today</span>
+                <span class="tag general">Movies & TV</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="category">
+        <h2>Video Platforms</h2>
+        <div class="grid">
+            <a href="https://www.youtube.com/" target="_blank" class="card">
+                <span class="name">YouTube</span>
+                <span class="url">youtube.com</span>
+                <span class="tag video">Video</span>
+            </a>
+            <a href="https://www.bilibili.com/" target="_blank" class="card">
+                <span class="name">Bilibili</span>
+                <span class="url">bilibili.com</span>
+                <span class="tag video">Chinese Video</span>
+            </a>
+            <a href="https://vimeo.com/" target="_blank" class="card">
+                <span class="name">Vimeo</span>
+                <span class="url">vimeo.com</span>
+                <span class="tag video">Video</span>
+            </a>
+            <a href="https://www.dailymotion.com/" target="_blank" class="card">
+                <span class="name">Dailymotion</span>
+                <span class="url">dailymotion.com</span>
+                <span class="tag video">Video</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="category">
+        <h2>Cloud Storage</h2>
+        <div class="grid">
+            <a href="https://gofile.io/" target="_blank" class="card">
+                <span class="name">Gofile</span>
+                <span class="url">gofile.io</span>
+                <span class="tag">Cloud Storage</span>
+            </a>
+        </div>
+    </div>
+
+    <footer>
+        <p>Media Dashboard</p>
+    </footer>
+</body>
+</html>
