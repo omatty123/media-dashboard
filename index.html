@@ -32,55 +32,22 @@
             text-shadow: 0 2px 10px rgba(0,0,0,0.3);
         }
 
-        .header-buttons {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .sync-btn {
+        .status {
+            font-size: 0.8rem;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
             background: rgba(34, 197, 94, 0.3);
             color: #4ade80;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            transition: all 0.2s;
         }
 
-        .sync-btn:hover {
-            background: rgba(34, 197, 94, 0.5);
+        .status.offline {
+            background: rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
         }
 
-        .export-btn {
-            background: rgba(139, 92, 246, 0.3);
-            color: #a78bfa;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            transition: all 0.2s;
-        }
-
-        .export-btn:hover {
-            background: rgba(139, 92, 246, 0.5);
-        }
-
-        .edit-btn {
+        .status.saving {
             background: rgba(251, 191, 36, 0.3);
             color: #fcd34d;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            transition: all 0.2s;
-            text-decoration: none;
-        }
-
-        .edit-btn:hover {
-            background: rgba(251, 191, 36, 0.5);
         }
 
         .category {
@@ -196,6 +163,13 @@
             background: rgba(239, 68, 68, 0.6);
         }
 
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+
         /* Modal styles */
         .modal {
             display: none;
@@ -282,29 +256,21 @@
             background: rgba(99, 110, 255, 0.7);
         }
 
-        .toast {
-            position: fixed;
-            bottom: 2rem;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(34, 197, 94, 0.9);
-            color: #fff;
-            padding: 1rem 2rem;
-            border-radius: 8px;
-            display: none;
-            z-index: 1001;
+        .setup-notice {
+            background: rgba(251, 191, 36, 0.2);
+            border: 1px solid rgba(251, 191, 36, 0.4);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            color: #fcd34d;
         }
 
-        .toast.active {
-            display: block;
-            animation: fadeInOut 2s ease;
+        .setup-notice h3 {
+            margin-bottom: 0.5rem;
         }
 
-        @keyframes fadeInOut {
-            0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
-            15% { opacity: 1; transform: translateX(-50%) translateY(0); }
-            85% { opacity: 1; transform: translateX(-50%) translateY(0); }
-            100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+        .setup-notice a {
+            color: #a0a8ff;
         }
 
         footer {
@@ -325,12 +291,13 @@
 <body>
     <header>
         <h1>Media Dashboard</h1>
-        <div class="header-buttons">
-            <button class="sync-btn" onclick="syncFromGitHub()">↻ Sync</button>
-            <button class="export-btn" onclick="exportData()">↓ Export</button>
-            <a href="https://github.com/omatty123/media-dashboard/edit/main/data.json" target="_blank" class="edit-btn">✎ Edit on GitHub</a>
-        </div>
+        <span class="status" id="status">Connecting...</span>
     </header>
+
+    <div class="setup-notice" id="setup-notice" style="display: none;">
+        <h3>Firebase Setup Required</h3>
+        <p>To enable cloud sync, update the Firebase config in this file. <a href="https://github.com/omatty123/media-dashboard/blob/main/README.md" target="_blank">See setup instructions</a></p>
+    </div>
 
     <div class="category">
         <div class="category-header">
@@ -379,93 +346,146 @@
         </div>
     </div>
 
-    <div class="toast" id="toast"></div>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
     <script>
-        const GITHUB_DATA_URL = 'https://raw.githubusercontent.com/omatty123/media-dashboard/main/data.json';
-
-        // Default data (fallback)
-        const defaultData = {
-            watching: [],
-            hopper: []
+        // =====================================================
+        // FIREBASE CONFIG - Replace with your own!
+        // =====================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyBxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+            authDomain: "your-project.firebaseapp.com",
+            databaseURL: "https://your-project-default-rtdb.firebaseio.com",
+            projectId: "your-project",
+            storageBucket: "your-project.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:abcdef123456"
         };
+        // =====================================================
 
+        let db = null;
+        let data = { watching: [], hopper: [] };
         let currentSection = 'watching';
+        let isConfigured = false;
 
-        // Show toast notification
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.classList.add('active');
-            setTimeout(() => toast.classList.remove('active'), 2000);
+        // Check if Firebase is configured
+        function checkFirebaseConfig() {
+            return !firebaseConfig.apiKey.includes('xxxx') &&
+                   !firebaseConfig.databaseURL.includes('your-project');
         }
 
-        // Load data from localStorage
-        function loadData() {
-            const stored = localStorage.getItem('mediaData');
-            if (stored) {
-                return JSON.parse(stored);
+        // Initialize Firebase
+        function initFirebase() {
+            if (!checkFirebaseConfig()) {
+                document.getElementById('setup-notice').style.display = 'block';
+                document.getElementById('status').textContent = 'Not configured';
+                document.getElementById('status').classList.add('offline');
+                loadFromLocalStorage();
+                return;
             }
-            return defaultData;
+
+            try {
+                firebase.initializeApp(firebaseConfig);
+                db = firebase.database();
+                isConfigured = true;
+
+                // Listen for real-time updates
+                db.ref('media').on('value', (snapshot) => {
+                    const val = snapshot.val();
+                    if (val) {
+                        data = val;
+                        // Ensure arrays exist
+                        if (!data.watching) data.watching = [];
+                        if (!data.hopper) data.hopper = [];
+                    }
+                    render();
+                    setStatus('Connected', 'online');
+                }, (error) => {
+                    console.error('Firebase error:', error);
+                    setStatus('Error', 'offline');
+                    loadFromLocalStorage();
+                });
+
+            } catch (error) {
+                console.error('Firebase init error:', error);
+                setStatus('Error', 'offline');
+                loadFromLocalStorage();
+            }
         }
 
-        // Save data to localStorage
-        function saveData(data) {
+        function setStatus(text, state) {
+            const status = document.getElementById('status');
+            status.textContent = text;
+            status.className = 'status';
+            if (state === 'offline') status.classList.add('offline');
+            if (state === 'saving') status.classList.add('saving');
+        }
+
+        // Save to Firebase
+        function saveToFirebase() {
+            if (isConfigured && db) {
+                setStatus('Saving...', 'saving');
+                db.ref('media').set(data)
+                    .then(() => setStatus('Saved', 'online'))
+                    .catch(err => {
+                        console.error('Save error:', err);
+                        setStatus('Save failed', 'offline');
+                    });
+            }
+            // Always save to localStorage as backup
             localStorage.setItem('mediaData', JSON.stringify(data));
         }
 
-        // Sync from GitHub
-        async function syncFromGitHub() {
-            try {
-                const response = await fetch(GITHUB_DATA_URL + '?t=' + Date.now());
-                if (response.ok) {
-                    const data = await response.json();
-                    saveData(data);
-                    renderDynamic();
-                    showToast('Synced from GitHub!');
-                } else {
-                    showToast('Failed to sync');
-                }
-            } catch (error) {
-                showToast('Sync error: ' + error.message);
+        // Load from localStorage (fallback)
+        function loadFromLocalStorage() {
+            const stored = localStorage.getItem('mediaData');
+            if (stored) {
+                data = JSON.parse(stored);
+            } else {
+                // Load initial data from data.json
+                fetch('data.json')
+                    .then(r => r.json())
+                    .then(d => {
+                        data = d;
+                        render();
+                    })
+                    .catch(() => {});
             }
+            render();
         }
 
-        // Export data to clipboard
-        function exportData() {
-            const data = loadData();
-            const json = JSON.stringify(data, null, 2);
-            navigator.clipboard.writeText(json).then(() => {
-                showToast('Data copied to clipboard!');
-            }).catch(() => {
-                // Fallback: show in prompt
-                prompt('Copy this data:', json);
-            });
-        }
-
-        // Render dynamic sections
-        function renderDynamic() {
-            const data = loadData();
-
+        // Render the lists
+        function render() {
             const watchingGrid = document.getElementById('watching-grid');
-            watchingGrid.innerHTML = data.watching.map((item, index) => `
-                <a href="${item.url}" target="_blank" class="card">
-                    <button class="delete-btn" onclick="deleteItem(event, 'watching', ${index})">×</button>
-                    <span class="name">${item.name}</span>
-                    <span class="episode">${item.episode}</span>
-                    <span class="tag watching">${item.source}</span>
-                </a>
-            `).join('');
-
             const hopperGrid = document.getElementById('hopper-grid');
-            hopperGrid.innerHTML = data.hopper.map((item, index) => `
-                <a href="${item.url}" target="_blank" class="card">
-                    <button class="delete-btn" onclick="deleteItem(event, 'hopper', ${index})">×</button>
-                    <span class="name">${item.name}</span>
-                    <span class="episode">${item.episode}</span>
-                    <span class="tag hopper">${item.source}</span>
-                </a>
-            `).join('');
+
+            if (data.watching.length === 0) {
+                watchingGrid.innerHTML = '<div class="empty-state">No shows yet. Click + Add to start!</div>';
+            } else {
+                watchingGrid.innerHTML = data.watching.map((item, index) => `
+                    <a href="${item.url}" target="_blank" class="card">
+                        <button class="delete-btn" onclick="deleteItem(event, 'watching', ${index})">×</button>
+                        <span class="name">${item.name}</span>
+                        <span class="episode">${item.episode}</span>
+                        <span class="tag watching">${item.source}</span>
+                    </a>
+                `).join('');
+            }
+
+            if (data.hopper.length === 0) {
+                hopperGrid.innerHTML = '<div class="empty-state">Nothing in the hopper yet.</div>';
+            } else {
+                hopperGrid.innerHTML = data.hopper.map((item, index) => `
+                    <a href="${item.url}" target="_blank" class="card">
+                        <button class="delete-btn" onclick="deleteItem(event, 'hopper', ${index})">×</button>
+                        <span class="name">${item.name}</span>
+                        <span class="episode">${item.episode}</span>
+                        <span class="tag hopper">${item.source}</span>
+                    </a>
+                `).join('');
+            }
         }
 
         // Modal functions
@@ -496,12 +516,10 @@
                 return;
             }
 
-            const data = loadData();
             data[currentSection].push({ name, url, episode, source });
-            saveData(data);
-            renderDynamic();
+            saveToFirebase();
+            render();
             closeModal();
-            showToast('Added! Click Export to save to GitHub');
         }
 
         function deleteItem(event, section, index) {
@@ -509,11 +527,9 @@
             event.stopPropagation();
 
             if (confirm('Remove this item?')) {
-                const data = loadData();
                 data[section].splice(index, 1);
-                saveData(data);
-                renderDynamic();
-                showToast('Removed! Click Export to save to GitHub');
+                saveToFirebase();
+                render();
             }
         }
 
@@ -526,27 +542,8 @@
             if (e.target.id === 'add-modal') closeModal();
         });
 
-        // Initialize: try to load from GitHub first, then use localStorage
-        async function init() {
-            const hasLocalData = localStorage.getItem('mediaData');
-
-            if (!hasLocalData) {
-                // First visit - load from GitHub
-                try {
-                    const response = await fetch(GITHUB_DATA_URL);
-                    if (response.ok) {
-                        const data = await response.json();
-                        saveData(data);
-                    }
-                } catch (error) {
-                    console.log('Could not fetch from GitHub, using defaults');
-                }
-            }
-
-            renderDynamic();
-        }
-
-        init();
+        // Initialize
+        initFirebase();
     </script>
 </body>
 </html>
