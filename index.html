@@ -245,6 +245,14 @@
             border-color: rgba(139, 92, 246, 0.3);
         }
 
+        .card-link {
+            display: flex;
+            flex-direction: column;
+            text-decoration: none;
+            color: inherit;
+            flex: 1;
+        }
+
         .card-image {
             width: 100%;
             height: 220px;
@@ -1052,11 +1060,13 @@
                      ondrop="handleCardDrop(event)">
                     <button class="delete-btn" onclick="deleteItem(event, '${section}', ${index})">×</button>
                     <button class="delete-btn" style="right:36px;color:#a0a8ff;" onclick="editItem(event, '${section}', ${index})">✎</button>
-                    ${imageHtml}
-                    <a href="${item.url}" target="_blank" class="card-content" style="text-decoration:none;color:inherit;">
-                        <span class="name">${item.name}</span>
-                        <span class="episode">${item.episode}</span>
-                        <span class="tag ${section}">${item.source}</span>
+                    <a href="${item.url}" target="_blank" class="card-link">
+                        ${imageHtml}
+                        <div class="card-content">
+                            <span class="name">${item.name}</span>
+                            <span class="episode">${item.episode}</span>
+                            <span class="tag ${section}">${item.source}</span>
+                        </div>
                     </a>
                 </div>
             `;
