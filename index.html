@@ -370,6 +370,22 @@
             object-fit: cover;
         }
 
+        .image-label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.8);
+            color: #fff;
+            font-size: 0.65rem;
+            padding: 2px 4px;
+            text-align: center;
+        }
+
+        .image-option {
+            position: relative;
+        }
+
         .selected-image {
             margin-top: 0.5rem;
             display: flex;
@@ -829,11 +845,18 @@
                 if (results.length === 0) {
                     container.innerHTML = '<div style="grid-column:1/-1;color:#7f8c8d;font-size:0.85rem;">No images found</div>';
                 } else {
-                    container.innerHTML = results.map(r => `
-                        <div class="image-option" onclick="selectImage('${TMDB_IMAGE_BASE}${r.poster_path}', this)">
-                            <img src="${TMDB_IMAGE_BASE}${r.poster_path}" alt="${r.name || r.title}">
-                        </div>
-                    `).join('');
+                    container.innerHTML = results.map(r => {
+                        const title = r.name || r.title;
+                        const year = (r.first_air_date || r.release_date || '').slice(0, 4);
+                        const country = r.origin_country?.[0] || '';
+                        const label = year ? `${title} (${year}${country ? ' ' + country : ''})` : title;
+                        return `
+                            <div class="image-option" onclick="selectImage('${TMDB_IMAGE_BASE}${r.poster_path}', this)" title="${label}">
+                                <img src="${TMDB_IMAGE_BASE}${r.poster_path}" alt="${label}">
+                                <div class="image-label">${year}${country ? ' ' + country : ''}</div>
+                            </div>
+                        `;
+                    }).join('');
                 }
             } catch (error) {
                 console.error('TMDB search error:', error);
