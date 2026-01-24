@@ -466,7 +466,10 @@
 <body>
     <header>
         <h1>Media Dashboard</h1>
-        <span class="status" id="status">Connecting...</span>
+        <div style="display:flex;gap:0.5rem;align-items:center;">
+            <button class="add-btn" onclick="fetchAllImages()" id="fetch-images-btn" style="display:none;">Fetch Images</button>
+            <span class="status" id="status">Connecting...</span>
+        </div>
     </header>
 
     <div class="setup-notice" id="setup-notice" style="display: none;">
@@ -666,6 +669,60 @@
             } else {
                 hopperGrid.innerHTML = data.hopper.map((item, index) => renderCard(item, 'hopper', index)).join('');
             }
+
+            // Show "Fetch Images" button if any items lack images
+            const hasItemsWithoutImages = [...data.watching, ...data.hopper].some(item => !item.image);
+            document.getElementById('fetch-images-btn').style.display = hasItemsWithoutImages ? 'block' : 'none';
+        }
+
+        // Auto-fetch images for all items without them
+        async function fetchAllImages() {
+            const btn = document.getElementById('fetch-images-btn');
+            btn.disabled = true;
+            btn.textContent = 'Fetching...';
+
+            const allItems = [
+                ...data.watching.map((item, i) => ({ item, section: 'watching', index: i })),
+                ...data.hopper.map((item, i) => ({ item, section: 'hopper', index: i }))
+            ].filter(({ item }) => !item.image);
+
+            let updated = 0;
+            for (const { item, section, index } of allItems) {
+                try {
+                    const [tvRes, movieRes] = await Promise.all([
+                        fetch(`https://api.themoviedb.org/3/search/tv?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(item.name)}`),
+                        fetch(`https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(item.name)}`)
+                    ]);
+
+                    const tvData = await tvRes.json();
+                    const movieData = await movieRes.json();
+
+                    const results = [
+                        ...tvData.results.map(r => ({ ...r, type: 'tv' })),
+                        ...movieData.results.map(r => ({ ...r, type: 'movie' }))
+                    ]
+                    .filter(r => r.poster_path)
+                    .sort((a, b) => b.popularity - a.popularity);
+
+                    if (results.length > 0) {
+                        data[section][index].image = TMDB_IMAGE_BASE + results[0].poster_path;
+                        updated++;
+                    }
+
+                    btn.textContent = `Fetching... (${updated}/${allItems.length})`;
+                    // Small delay to avoid rate limiting
+                    await new Promise(r => setTimeout(r, 200));
+                } catch (err) {
+                    console.error('Error fetching image for', item.name, err);
+                }
+            }
+
+            if (updated > 0) {
+                saveToFirebase();
+            }
+            render();
+            btn.disabled = false;
+            btn.textContent = 'Fetch Images';
         }
 
         function renderCard(item, section, index) {
