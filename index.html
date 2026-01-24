@@ -170,6 +170,35 @@
             font-style: italic;
         }
 
+        /* Drag and drop styles */
+        .card[draggable="true"] {
+            cursor: grab;
+        }
+
+        .card.dragging {
+            opacity: 0.5;
+            cursor: grabbing;
+        }
+
+        .grid.drag-over {
+            background: rgba(99, 110, 255, 0.1);
+            border-radius: 12px;
+            outline: 2px dashed rgba(99, 110, 255, 0.5);
+            outline-offset: -2px;
+        }
+
+        .drop-hint {
+            display: none;
+            padding: 1rem;
+            text-align: center;
+            color: #a0a8ff;
+            font-size: 0.9rem;
+        }
+
+        .grid.drag-over .drop-hint {
+            display: block;
+        }
+
         /* Modal styles */
         .modal {
             display: none;
@@ -304,7 +333,7 @@
             <h2>Currently Watching</h2>
             <button class="add-btn" onclick="openModal('watching')">+ Add</button>
         </div>
-        <div class="grid" id="watching-grid"></div>
+        <div class="grid" id="watching-grid" data-section="watching"></div>
     </div>
 
     <div class="category">
@@ -312,7 +341,7 @@
             <h2>In the Hopper</h2>
             <button class="add-btn" onclick="openModal('hopper')">+ Add</button>
         </div>
-        <div class="grid" id="hopper-grid"></div>
+        <div class="grid" id="hopper-grid" data-section="hopper"></div>
     </div>
 
     <footer>
@@ -462,30 +491,92 @@
             const hopperGrid = document.getElementById('hopper-grid');
 
             if (data.watching.length === 0) {
-                watchingGrid.innerHTML = '<div class="empty-state">No shows yet. Click + Add to start!</div>';
+                watchingGrid.innerHTML = '<div class="empty-state">No shows yet. Click + Add or drag here!</div>';
             } else {
                 watchingGrid.innerHTML = data.watching.map((item, index) => `
-                    <a href="${item.url}" target="_blank" class="card">
+                    <div class="card" draggable="true" data-section="watching" data-index="${index}"
+                         ondragstart="handleDragStart(event)" ondragend="handleDragEnd(event)">
                         <button class="delete-btn" onclick="deleteItem(event, 'watching', ${index})">×</button>
-                        <span class="name">${item.name}</span>
-                        <span class="episode">${item.episode}</span>
+                        <a href="${item.url}" target="_blank" style="text-decoration:none;color:inherit;">
+                            <span class="name">${item.name}</span>
+                            <span class="episode">${item.episode}</span>
+                        </a>
                         <span class="tag watching">${item.source}</span>
-                    </a>
+                    </div>
                 `).join('');
             }
 
             if (data.hopper.length === 0) {
-                hopperGrid.innerHTML = '<div class="empty-state">Nothing in the hopper yet.</div>';
+                hopperGrid.innerHTML = '<div class="empty-state">Nothing in the hopper. Drag here!</div>';
             } else {
                 hopperGrid.innerHTML = data.hopper.map((item, index) => `
-                    <a href="${item.url}" target="_blank" class="card">
+                    <div class="card" draggable="true" data-section="hopper" data-index="${index}"
+                         ondragstart="handleDragStart(event)" ondragend="handleDragEnd(event)">
                         <button class="delete-btn" onclick="deleteItem(event, 'hopper', ${index})">×</button>
-                        <span class="name">${item.name}</span>
-                        <span class="episode">${item.episode}</span>
+                        <a href="${item.url}" target="_blank" style="text-decoration:none;color:inherit;">
+                            <span class="name">${item.name}</span>
+                            <span class="episode">${item.episode}</span>
+                        </a>
                         <span class="tag hopper">${item.source}</span>
-                    </a>
+                    </div>
                 `).join('');
             }
+        }
+
+        // Drag and drop handlers
+        let draggedItem = null;
+        let draggedSection = null;
+        let draggedIndex = null;
+
+        function handleDragStart(e) {
+            draggedItem = e.target.closest('.card');
+            draggedSection = draggedItem.dataset.section;
+            draggedIndex = parseInt(draggedItem.dataset.index);
+            draggedItem.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        function handleDragEnd(e) {
+            if (draggedItem) {
+                draggedItem.classList.remove('dragging');
+            }
+            document.querySelectorAll('.grid').forEach(g => g.classList.remove('drag-over'));
+            draggedItem = null;
+            draggedSection = null;
+            draggedIndex = null;
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            e.currentTarget.classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            const targetSection = e.currentTarget.dataset.section;
+            e.currentTarget.classList.remove('drag-over');
+
+            if (draggedSection && targetSection && draggedSection !== targetSection) {
+                // Move item from one section to another
+                const item = data[draggedSection].splice(draggedIndex, 1)[0];
+                data[targetSection].push(item);
+                saveToFirebase();
+                render();
+                setupDropZones();
+            }
+        }
+
+        function setupDropZones() {
+            document.querySelectorAll('.grid').forEach(grid => {
+                grid.ondragover = handleDragOver;
+                grid.ondragleave = handleDragLeave;
+                grid.ondrop = handleDrop;
+            });
         }
 
         // Modal functions
@@ -544,6 +635,7 @@
 
         // Initialize
         initFirebase();
+        setupDropZones();
     </script>
 </body>
 </html>
