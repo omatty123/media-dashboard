@@ -230,7 +230,7 @@
             overflow: hidden;
             text-decoration: none;
             color: var(--text-primary);
-            transition: all 0.3s ease;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease, border-color 0.15s ease;
             border: 1px solid var(--border);
             display: flex;
             flex-direction: column;
@@ -372,23 +372,31 @@
         }
 
         .card.dragging {
-            opacity: 0.5;
+            opacity: 0.4;
             cursor: grabbing;
+            transform: scale(0.95);
+            box-shadow: 0 0 0 2px var(--accent-primary);
         }
 
         .grid.drag-over {
-            background: rgba(139, 92, 246, 0.1);
+            background: rgba(139, 92, 246, 0.08);
             border-radius: var(--radius-md);
             outline: 2px dashed var(--accent-primary);
-            outline-offset: -2px;
+            outline-offset: 4px;
+            padding: 8px;
+            margin: -8px;
         }
 
         .card.drop-before {
-            box-shadow: -4px 0 0 var(--accent-primary);
+            transform: scale(1.02) translateX(8px);
+            border-color: var(--accent-primary);
+            box-shadow: -6px 0 0 var(--accent-primary), 0 4px 20px rgba(139, 92, 246, 0.4);
         }
 
         .card.drop-after {
-            box-shadow: 4px 0 0 var(--accent-primary);
+            transform: scale(1.02) translateX(-8px);
+            border-color: var(--accent-primary);
+            box-shadow: 6px 0 0 var(--accent-primary), 0 4px 20px rgba(139, 92, 246, 0.4);
         }
 
         /* Modal styles */
@@ -1184,7 +1192,22 @@
             draggedItem = e.target.closest('.card');
             draggedSection = draggedItem.dataset.section;
             draggedIndex = parseInt(draggedItem.dataset.index);
-            draggedItem.classList.add('dragging');
+
+            // Create custom drag image
+            const dragImage = draggedItem.cloneNode(true);
+            dragImage.style.position = 'absolute';
+            dragImage.style.top = '-1000px';
+            dragImage.style.opacity = '0.9';
+            dragImage.style.transform = 'rotate(3deg) scale(0.9)';
+            dragImage.style.boxShadow = '0 20px 40px rgba(139, 92, 246, 0.4)';
+            dragImage.style.border = '2px solid var(--accent-primary)';
+            dragImage.style.width = draggedItem.offsetWidth + 'px';
+            document.body.appendChild(dragImage);
+            e.dataTransfer.setDragImage(dragImage, draggedItem.offsetWidth / 2, 30);
+            setTimeout(() => document.body.removeChild(dragImage), 0);
+
+            // Delay adding class for smoother start
+            setTimeout(() => draggedItem.classList.add('dragging'), 0);
             e.dataTransfer.effectAllowed = 'move';
         }
 
