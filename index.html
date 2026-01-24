@@ -386,6 +386,21 @@
             position: relative;
         }
 
+        .remove-image-btn {
+            background: rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+            border: none;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            margin-left: auto;
+        }
+
+        .remove-image-btn:hover {
+            background: rgba(239, 68, 68, 0.5);
+        }
+
         .selected-image {
             margin-top: 0.5rem;
             display: flex;
@@ -884,6 +899,14 @@
             document.getElementById('selected-image').style.display = 'none';
         }
 
+        function removeImage() {
+            selectedImageUrl = '';  // Empty string means explicitly remove
+            document.getElementById('image-results').innerHTML = '';
+            const preview = document.getElementById('selected-image');
+            preview.innerHTML = '<span style="color:#fca5a5;">Image will be removed</span>';
+            preview.style.display = 'flex';
+        }
+
         // Streaming site search URLs
         const siteSearchUrls = {
             flixmomo: 'https://flixmomo.org/search?keyword=',
@@ -1066,7 +1089,7 @@
             if (item.image) {
                 selectedImageUrl = item.image;
                 const preview = document.getElementById('selected-image');
-                preview.innerHTML = `<img src="${item.image}"><span>Current image (search to change)</span>`;
+                preview.innerHTML = `<img src="${item.image}"><span>Current image</span><button class="remove-image-btn" onclick="removeImage()">Remove</button>`;
                 preview.style.display = 'flex';
             }
 
@@ -1098,9 +1121,15 @@
             if (selectedImageUrl) {
                 item.image = selectedImageUrl;
             }
+            // If selectedImageUrl is empty string, explicitly don't add image (removes it)
 
             if (editingIndex !== null) {
-                // Editing existing item
+                // Editing existing item - preserve image if not changed
+                if (selectedImageUrl === null) {
+                    // Image wasn't touched, keep existing
+                    const existingImage = data[currentSection][editingIndex].image;
+                    if (existingImage) item.image = existingImage;
+                }
                 data[currentSection][editingIndex] = item;
             } else {
                 // Adding new item
