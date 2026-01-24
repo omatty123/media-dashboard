@@ -87,21 +87,20 @@
 
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
             gap: 1rem;
         }
 
         .card {
             background: rgba(255,255,255,0.05);
             border-radius: 12px;
-            padding: 1.25rem;
+            overflow: hidden;
             text-decoration: none;
             color: #fff;
             transition: all 0.3s ease;
             border: 1px solid rgba(255,255,255,0.08);
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
             position: relative;
         }
 
@@ -112,14 +111,37 @@
             border-color: rgba(255,255,255,0.2);
         }
 
+        .card-image {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .card-image.placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: rgba(255,255,255,0.2);
+        }
+
+        .card-content {
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
         .card .name {
             font-weight: 600;
-            font-size: 1.1rem;
-            padding-right: 24px;
+            font-size: 1rem;
+            padding-right: 20px;
+            line-height: 1.3;
         }
 
         .card .episode {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: #a0a8ff;
             font-weight: 500;
         }
@@ -128,10 +150,10 @@
             display: inline-block;
             background: rgba(99, 110, 255, 0.3);
             color: #a0a8ff;
-            padding: 0.2rem 0.6rem;
+            padding: 0.2rem 0.5rem;
             border-radius: 20px;
-            font-size: 0.7rem;
-            margin-top: 0.5rem;
+            font-size: 0.65rem;
+            margin-top: 0.3rem;
             width: fit-content;
         }
 
@@ -142,17 +164,18 @@
             position: absolute;
             top: 8px;
             right: 8px;
-            background: rgba(239, 68, 68, 0.3);
+            background: rgba(0,0,0,0.6);
             color: #fca5a5;
             border: none;
-            width: 22px;
-            height: 22px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
             cursor: pointer;
             font-size: 14px;
             line-height: 1;
             opacity: 0;
             transition: opacity 0.2s;
+            z-index: 10;
         }
 
         .card:hover .delete-btn {
@@ -160,7 +183,7 @@
         }
 
         .delete-btn:hover {
-            background: rgba(239, 68, 68, 0.6);
+            background: rgba(239, 68, 68, 0.8);
         }
 
         .empty-state {
@@ -187,18 +210,6 @@
             outline-offset: -2px;
         }
 
-        .drop-hint {
-            display: none;
-            padding: 1rem;
-            text-align: center;
-            color: #a0a8ff;
-            font-size: 0.9rem;
-        }
-
-        .grid.drag-over .drop-hint {
-            display: block;
-        }
-
         /* Modal styles */
         .modal {
             display: none;
@@ -211,6 +222,8 @@
             justify-content: center;
             align-items: center;
             z-index: 1000;
+            overflow-y: auto;
+            padding: 2rem;
         }
 
         .modal.active {
@@ -221,9 +234,10 @@
             background: #1a1a2e;
             padding: 2rem;
             border-radius: 12px;
-            width: 90%;
-            max-width: 400px;
+            width: 100%;
+            max-width: 500px;
             border: 1px solid rgba(255,255,255,0.1);
+            margin: auto;
         }
 
         .modal h3 {
@@ -254,6 +268,129 @@
 
         .form-group input::placeholder {
             color: #7f8c8d;
+        }
+
+        .search-row {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .search-row input {
+            flex: 1;
+        }
+
+        .search-btn {
+            background: rgba(99, 110, 255, 0.5);
+            color: #fff;
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .search-btn:hover {
+            background: rgba(99, 110, 255, 0.7);
+        }
+
+        .search-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .image-results {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .image-option {
+            aspect-ratio: 2/3;
+            border-radius: 6px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .image-option:hover {
+            border-color: rgba(99, 110, 255, 0.5);
+        }
+
+        .image-option.selected {
+            border-color: #a0a8ff;
+        }
+
+        .image-option img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .selected-image {
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #4ade80;
+            font-size: 0.85rem;
+        }
+
+        .selected-image img {
+            width: 40px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .find-links-section {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .find-links-section h4 {
+            font-size: 0.85rem;
+            color: #a4b0be;
+            margin-bottom: 0.75rem;
+        }
+
+        .site-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .site-btn {
+            background: rgba(99, 110, 255, 0.2);
+            color: #a0a8ff;
+            border: 1px solid rgba(99, 110, 255, 0.3);
+            padding: 0.4rem 0.75rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+
+        .site-btn:hover {
+            background: rgba(99, 110, 255, 0.4);
+            border-color: rgba(99, 110, 255, 0.5);
+        }
+
+        .site-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .find-links-hint {
+            font-size: 0.75rem;
+            color: #7f8c8d;
+            margin-top: 0.5rem;
         }
 
         .modal-buttons {
@@ -312,8 +449,9 @@
         @media (max-width: 600px) {
             body { padding: 1rem; }
             h1 { font-size: 1.8rem; }
-            .grid { grid-template-columns: 1fr; }
+            .grid { grid-template-columns: repeat(2, 1fr); }
             header { flex-direction: column; gap: 1rem; }
+            .image-results { grid-template-columns: repeat(3, 1fr); }
         }
     </style>
 </head>
@@ -354,7 +492,28 @@
             <h3 id="modal-title">Add to Currently Watching</h3>
             <div class="form-group">
                 <label>Title</label>
-                <input type="text" id="item-name" placeholder="Show or movie name">
+                <div class="search-row">
+                    <input type="text" id="item-name" placeholder="Show or movie name" oninput="clearImageSelection()">
+                    <button class="search-btn" onclick="searchImages()" id="search-btn">Search</button>
+                </div>
+                <div class="image-results" id="image-results"></div>
+                <div class="selected-image" id="selected-image" style="display:none;"></div>
+            </div>
+            <div class="find-links-section">
+                <h4>Find Streaming Links</h4>
+                <div class="site-buttons" id="site-buttons">
+                    <button class="site-btn" onclick="searchSite('flixmomo')">Flixmomo</button>
+                    <button class="site-btn" onclick="searchSite('asiaflix')">Asiaflix</button>
+                    <button class="site-btn" onclick="searchSite('dramacool')">Dramacool</button>
+                    <button class="site-btn" onclick="searchSite('myasiantv')">MyAsianTV</button>
+                    <button class="site-btn" onclick="searchSite('kisskh')">KissKH</button>
+                    <button class="site-btn" onclick="searchSite('goplay')">GoPlay</button>
+                    <button class="site-btn" onclick="searchSite('primeflix')">PrimeFlix</button>
+                    <button class="site-btn" onclick="searchSite('cineby')">Cineby</button>
+                    <button class="site-btn" onclick="searchSite('netflix')">Netflix</button>
+                    <button class="site-btn" onclick="searchSite('amazon')">Amazon</button>
+                </div>
+                <p class="find-links-hint">Enter title above, click a site to search. Copy the URL back here.</p>
             </div>
             <div class="form-group">
                 <label>URL</label>
@@ -381,7 +540,7 @@
 
     <script>
         // =====================================================
-        // FIREBASE CONFIG - Replace with your own!
+        // FIREBASE CONFIG
         // =====================================================
         const firebaseConfig = {
             apiKey: "AIzaSyAZMcnAqRvNPAMm7mrLEwHw8v2wGUrXttA",
@@ -392,12 +551,16 @@
             messagingSenderId: "35797577910",
             appId: "1:35797577910:web:810f17d2e1d26e76c5b617"
         };
-        // =====================================================
+
+        // TMDB API (free read-only access)
+        const TMDB_API_KEY = '2dca580c2a14b55200e784d157207b4d';
+        const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p/w300';
 
         let db = null;
         let data = { watching: [], hopper: [] };
         let currentSection = 'watching';
         let isConfigured = false;
+        let selectedImageUrl = null;
 
         // Check if Firebase is configured
         function checkFirebaseConfig() {
@@ -420,12 +583,10 @@
                 db = firebase.database();
                 isConfigured = true;
 
-                // Listen for real-time updates
                 db.ref('media').on('value', (snapshot) => {
                     const val = snapshot.val();
                     if (val) {
                         data = val;
-                        // Ensure arrays exist
                         if (!data.watching) data.watching = [];
                         if (!data.hopper) data.hopper = [];
                     }
@@ -452,7 +613,6 @@
             if (state === 'saving') status.classList.add('saving');
         }
 
-        // Save to Firebase
         function saveToFirebase() {
             if (isConfigured && db) {
                 setStatus('Saving...', 'saving');
@@ -463,17 +623,14 @@
                         setStatus('Save failed', 'offline');
                     });
             }
-            // Always save to localStorage as backup
             localStorage.setItem('mediaData', JSON.stringify(data));
         }
 
-        // Load from localStorage (fallback)
         function loadFromLocalStorage() {
             const stored = localStorage.getItem('mediaData');
             if (stored) {
                 data = JSON.parse(stored);
             } else {
-                // Load initial data from data.json
                 fetch('data.json')
                     .then(r => r.json())
                     .then(d => {
@@ -493,33 +650,122 @@
             if (data.watching.length === 0) {
                 watchingGrid.innerHTML = '<div class="empty-state">No shows yet. Click + Add or drag here!</div>';
             } else {
-                watchingGrid.innerHTML = data.watching.map((item, index) => `
-                    <div class="card" draggable="true" data-section="watching" data-index="${index}"
-                         ondragstart="handleDragStart(event)" ondragend="handleDragEnd(event)">
-                        <button class="delete-btn" onclick="deleteItem(event, 'watching', ${index})">×</button>
-                        <a href="${item.url}" target="_blank" style="text-decoration:none;color:inherit;">
-                            <span class="name">${item.name}</span>
-                            <span class="episode">${item.episode}</span>
-                        </a>
-                        <span class="tag watching">${item.source}</span>
-                    </div>
-                `).join('');
+                watchingGrid.innerHTML = data.watching.map((item, index) => renderCard(item, 'watching', index)).join('');
             }
 
             if (data.hopper.length === 0) {
                 hopperGrid.innerHTML = '<div class="empty-state">Nothing in the hopper. Drag here!</div>';
             } else {
-                hopperGrid.innerHTML = data.hopper.map((item, index) => `
-                    <div class="card" draggable="true" data-section="hopper" data-index="${index}"
-                         ondragstart="handleDragStart(event)" ondragend="handleDragEnd(event)">
-                        <button class="delete-btn" onclick="deleteItem(event, 'hopper', ${index})">×</button>
-                        <a href="${item.url}" target="_blank" style="text-decoration:none;color:inherit;">
-                            <span class="name">${item.name}</span>
-                            <span class="episode">${item.episode}</span>
-                        </a>
-                        <span class="tag hopper">${item.source}</span>
-                    </div>
-                `).join('');
+                hopperGrid.innerHTML = data.hopper.map((item, index) => renderCard(item, 'hopper', index)).join('');
+            }
+        }
+
+        function renderCard(item, section, index) {
+            const imageHtml = item.image
+                ? `<img class="card-image" src="${item.image}" alt="${item.name}" onerror="this.outerHTML='<div class=\\'card-image placeholder\\'>🎬</div>'">`
+                : `<div class="card-image placeholder">🎬</div>`;
+
+            return `
+                <div class="card" draggable="true" data-section="${section}" data-index="${index}"
+                     ondragstart="handleDragStart(event)" ondragend="handleDragEnd(event)">
+                    <button class="delete-btn" onclick="deleteItem(event, '${section}', ${index})">×</button>
+                    ${imageHtml}
+                    <a href="${item.url}" target="_blank" class="card-content" style="text-decoration:none;color:inherit;">
+                        <span class="name">${item.name}</span>
+                        <span class="episode">${item.episode}</span>
+                        <span class="tag ${section}">${item.source}</span>
+                    </a>
+                </div>
+            `;
+        }
+
+        // TMDB Image Search
+        async function searchImages() {
+            const query = document.getElementById('item-name').value.trim();
+            if (!query) return;
+
+            const btn = document.getElementById('search-btn');
+            btn.disabled = true;
+            btn.textContent = '...';
+
+            try {
+                // Search both TV and movies
+                const [tvRes, movieRes] = await Promise.all([
+                    fetch(`https://api.themoviedb.org/3/search/tv?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}`),
+                    fetch(`https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}`)
+                ]);
+
+                const tvData = await tvRes.json();
+                const movieData = await movieRes.json();
+
+                // Combine and sort by popularity
+                const results = [
+                    ...tvData.results.map(r => ({ ...r, type: 'tv' })),
+                    ...movieData.results.map(r => ({ ...r, type: 'movie' }))
+                ]
+                .filter(r => r.poster_path)
+                .sort((a, b) => b.popularity - a.popularity)
+                .slice(0, 8);
+
+                const container = document.getElementById('image-results');
+                if (results.length === 0) {
+                    container.innerHTML = '<div style="grid-column:1/-1;color:#7f8c8d;font-size:0.85rem;">No images found</div>';
+                } else {
+                    container.innerHTML = results.map(r => `
+                        <div class="image-option" onclick="selectImage('${TMDB_IMAGE_BASE}${r.poster_path}', this)">
+                            <img src="${TMDB_IMAGE_BASE}${r.poster_path}" alt="${r.name || r.title}">
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('TMDB search error:', error);
+                document.getElementById('image-results').innerHTML =
+                    '<div style="grid-column:1/-1;color:#fca5a5;font-size:0.85rem;">Search failed</div>';
+            }
+
+            btn.disabled = false;
+            btn.textContent = 'Search';
+        }
+
+        function selectImage(url, element) {
+            selectedImageUrl = url;
+            document.querySelectorAll('.image-option').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+
+            const preview = document.getElementById('selected-image');
+            preview.innerHTML = `<img src="${url}"><span>Image selected</span>`;
+            preview.style.display = 'flex';
+        }
+
+        function clearImageSelection() {
+            selectedImageUrl = null;
+            document.getElementById('image-results').innerHTML = '';
+            document.getElementById('selected-image').style.display = 'none';
+        }
+
+        // Streaming site search URLs
+        const siteSearchUrls = {
+            flixmomo: 'https://flixmomo.org/search?keyword=',
+            asiaflix: 'https://asiaflix.net/search?q=',
+            dramacool: 'https://dramacool9.com.ro/search?keyword=',
+            myasiantv: 'https://ww5.myasiantv.rest/search?s=',
+            kisskh: 'https://kisskh.co/Search?q=',
+            goplay: 'https://goplay.su/search/',
+            primeflix: 'https://primeflix-vercel.com/search?q=',
+            cineby: 'https://www.cineby.app/search?q=',
+            netflix: 'https://www.netflix.com/search?q=',
+            amazon: 'https://www.amazon.com/s?k='
+        };
+
+        function searchSite(site) {
+            const query = document.getElementById('item-name').value.trim();
+            if (!query) {
+                alert('Enter a title first');
+                return;
+            }
+            const baseUrl = siteSearchUrls[site];
+            if (baseUrl) {
+                window.open(baseUrl + encodeURIComponent(query), '_blank');
             }
         }
 
@@ -562,7 +808,6 @@
             e.currentTarget.classList.remove('drag-over');
 
             if (draggedSection && targetSection && draggedSection !== targetSection) {
-                // Move item from one section to another
                 const item = data[draggedSection].splice(draggedIndex, 1)[0];
                 data[targetSection].push(item);
                 saveToFirebase();
@@ -594,6 +839,7 @@
             document.getElementById('item-url').value = '';
             document.getElementById('item-episode').value = '';
             document.getElementById('item-source').value = '';
+            clearImageSelection();
         }
 
         function saveItem() {
@@ -607,7 +853,12 @@
                 return;
             }
 
-            data[currentSection].push({ name, url, episode, source });
+            const item = { name, url, episode, source };
+            if (selectedImageUrl) {
+                item.image = selectedImageUrl;
+            }
+
+            data[currentSection].push(item);
             saveToFirebase();
             render();
             closeModal();
@@ -623,6 +874,14 @@
                 render();
             }
         }
+
+        // Allow Enter key to search
+        document.getElementById('item-name').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                searchImages();
+            }
+        });
 
         // Close modal on escape or click outside
         document.addEventListener('keydown', (e) => {
