@@ -38,7 +38,96 @@
             background: var(--bg-primary);
             min-height: 100vh;
             color: var(--text-primary);
-            padding: 2rem;
+            display: flex;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            min-height: 100vh;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border);
+            padding: 32px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+            position: fixed;
+            left: 0;
+            top: 0;
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-logo-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent-primary), #6366F1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .sidebar-logo-text {
+            font-family: var(--font-headline);
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+
+        .nav-item:hover {
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: rgba(139, 92, 246, 0.15);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active .nav-icon {
+            color: var(--accent-primary);
+        }
+
+        .nav-icon {
+            font-size: 1.25rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .nav-label {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Main content */
+        .main-content {
+            margin-left: 260px;
+            flex: 1;
+            padding: 32px;
+            min-height: 100vh;
         }
 
         header {
@@ -50,7 +139,7 @@
 
         h1 {
             font-family: var(--font-headline);
-            font-size: 2.5rem;
+            font-size: 1.75rem;
             font-weight: 700;
             color: var(--text-primary);
         }
@@ -113,10 +202,26 @@
             box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
         }
 
+        .item-count {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* Currently Watching - larger cards */
+        #watching-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        #watching-grid .card-image {
+            height: 280px;
+        }
+
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 1.25rem;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 16px;
         }
 
         .card {
@@ -130,6 +235,7 @@
             display: flex;
             flex-direction: column;
             position: relative;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
         }
 
         .card:hover {
@@ -141,7 +247,7 @@
 
         .card-image {
             width: 100%;
-            height: 140px;
+            height: 220px;
             object-fit: cover;
             background: var(--bg-card);
         }
@@ -197,7 +303,7 @@
 
         #watched-grid .card {
             font-size: 0.85rem;
-            opacity: 0.75;
+            opacity: 0.7;
         }
 
         #watched-grid .card:hover {
@@ -205,7 +311,7 @@
         }
 
         #watched-grid .card-image {
-            height: 100px;
+            height: 190px;
         }
 
         #watched-grid .card-content {
@@ -594,58 +700,94 @@
             font-size: 0.85rem;
         }
 
-        @media (max-width: 600px) {
-            body { padding: 1rem; }
-            h1 { font-size: 1.8rem; }
+        @media (max-width: 900px) {
+            .sidebar {
+                display: none;
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+            h1 { font-size: 1.5rem; }
             .grid { grid-template-columns: repeat(2, 1fr); }
-            header { flex-direction: column; gap: 1rem; }
+            #watching-grid { grid-template-columns: repeat(2, 1fr); }
+            #watching-grid .card-image { height: 200px; }
+            header { flex-direction: column; gap: 1rem; align-items: flex-start; }
             .image-results { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        @media (max-width: 500px) {
+            .grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            #watching-grid { grid-template-columns: repeat(2, 1fr); }
+            #watching-grid .card-image { height: 160px; }
+            .card-image { height: 180px; }
+            #watched-grid .card-image { height: 140px; }
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Media Dashboard</h1>
-        <div style="display:flex;gap:0.5rem;align-items:center;">
-            <button class="add-btn" onclick="fetchAllImages()" id="fetch-images-btn" style="display:none;">Fetch Images</button>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <div class="sidebar-logo-icon">▶</div>
+            <span class="sidebar-logo-text">Media</span>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="#watching" class="nav-item active" onclick="scrollToSection('watching')">
+                <span class="nav-icon">👁</span>
+                <span class="nav-label">Currently Watching</span>
+            </a>
+            <a href="#hopper" class="nav-item" onclick="scrollToSection('hopper')">
+                <span class="nav-icon">📋</span>
+                <span class="nav-label">In the Hopper</span>
+            </a>
+            <a href="#watched" class="nav-item" onclick="scrollToSection('watched')">
+                <span class="nav-icon">✓</span>
+                <span class="nav-label">Watched</span>
+            </a>
+        </nav>
+        <div style="margin-top:auto;">
             <span class="status" id="status">Connecting...</span>
         </div>
-    </header>
+    </aside>
 
-    <div class="setup-notice" id="setup-notice" style="display: none;">
-        <h3>Firebase Setup Required</h3>
-        <p>To enable cloud sync, update the Firebase config in this file. <a href="https://github.com/omatty123/media-dashboard/blob/main/README.md" target="_blank">See setup instructions</a></p>
-    </div>
+    <!-- Main Content -->
+    <main class="main-content">
+        <header>
+            <h1>Currently Watching</h1>
+            <div style="display:flex;gap:0.5rem;align-items:center;">
+                <button class="add-btn" onclick="fetchAllImages()" id="fetch-images-btn" style="display:none;">Fetch Images</button>
+                <button class="add-btn" onclick="openModal('watching')">+ Add Media</button>
+            </div>
+        </header>
 
-    <div class="category">
-        <div class="category-header">
-            <h2>Currently Watching</h2>
-            <button class="add-btn" onclick="openModal('watching')">+ Add</button>
+        <div class="setup-notice" id="setup-notice" style="display: none;">
+            <h3>Firebase Setup Required</h3>
+            <p>To enable cloud sync, update the Firebase config in this file. <a href="https://github.com/omatty123/media-dashboard/blob/main/README.md" target="_blank">See setup instructions</a></p>
         </div>
-        <div class="grid" id="watching-grid" data-section="watching"></div>
-    </div>
 
-    <div class="category">
-        <div class="category-header">
-            <h2>In the Hopper</h2>
-            <button class="add-btn" onclick="openModal('hopper')">+ Add</button>
+        <div class="category" id="watching">
+            <div class="grid" id="watching-grid" data-section="watching"></div>
         </div>
-        <div class="grid" id="hopper-grid" data-section="hopper"></div>
-    </div>
 
-    <div class="category">
-        <div class="category-header">
-            <h2>Watched</h2>
-            <button class="add-btn" onclick="openModal('watched')">+ Add</button>
+        <div class="category" id="hopper">
+            <div class="category-header">
+                <h2>In the Hopper</h2>
+                <span class="item-count" id="hopper-count"></span>
+            </div>
+            <div class="grid" id="hopper-grid" data-section="hopper"></div>
         </div>
-        <div class="grid" id="watched-grid" data-section="watched"></div>
-    </div>
 
-    <footer>
-        <p>Media Dashboard</p>
-    </footer>
+        <div class="category" id="watched">
+            <div class="category-header">
+                <h2>Watched</h2>
+                <span class="item-count" id="watched-count"></span>
+            </div>
+            <div class="grid" id="watched-grid" data-section="watched"></div>
+        </div>
+    </main>
 
-    <!-- Add Modal -->
+    <!-- Modal -->
     <div class="modal" id="add-modal">
         <div class="modal-content">
             <h3 id="modal-title">Add to Currently Watching</h3>
@@ -829,6 +971,10 @@
             } else {
                 watchedGrid.innerHTML = data.watched.map((item, index) => renderCard(item, 'watched', index)).join('');
             }
+
+            // Update item counts
+            document.getElementById('hopper-count').textContent = data.hopper.length > 0 ? `${data.hopper.length} items` : '';
+            document.getElementById('watched-count').textContent = data.watched.length > 0 ? `${data.watched.length} completed` : '';
 
             // Show "Fetch Images" button if any items lack images
             const hasItemsWithoutImages = [...data.watching, ...data.hopper, ...data.watched].some(item => !item.image);
@@ -1265,6 +1411,14 @@
         document.getElementById('add-modal').addEventListener('click', (e) => {
             if (e.target.id === 'add-modal') closeModal();
         });
+
+        // Scroll to section and update active nav
+        function scrollToSection(section) {
+            event.preventDefault();
+            document.getElementById(section).scrollIntoView({ behavior: 'smooth' });
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            document.querySelector(`[href="#${section}"]`).classList.add('active');
+        }
 
         // Initialize
         initFirebase();
