@@ -96,6 +96,14 @@
         .card .tag.video { background: rgba(34, 197, 94, 0.3); color: #4ade80; }
         .card .tag.storage { background: rgba(139, 92, 246, 0.3); color: #a78bfa; }
         .card .tag.premium { background: rgba(59, 130, 246, 0.3); color: #93c5fd; }
+        .card .tag.watching { background: rgba(239, 68, 68, 0.3); color: #fca5a5; }
+        .card .tag.hopper { background: rgba(251, 191, 36, 0.3); color: #fcd34d; }
+
+        .card .episode {
+            font-size: 0.85rem;
+            color: #a0a8ff;
+            font-weight: 500;
+        }
 
         footer {
             text-align: center;
@@ -113,6 +121,93 @@
 </head>
 <body>
     <h1>Media Dashboard</h1>
+
+    <div class="category">
+        <h2>Currently Watching</h2>
+        <div class="grid">
+            <a href="https://flixmomo.org/tv/250307/the-pitt/season/1?e=3&p=2" target="_blank" class="card">
+                <span class="name">The Pitt</span>
+                <span class="episode">Season 1</span>
+                <span class="tag watching">Flixmomo</span>
+            </a>
+            <a href="https://flixmomo.org/tv/241609/your-friends-neighbors/season/1?e=3&p=5" target="_blank" class="card">
+                <span class="name">Your Friends & Neighbors</span>
+                <span class="episode">Season 1</span>
+                <span class="tag watching">Flixmomo</span>
+            </a>
+            <a href="https://dramacool9.com.ro/taxi-driver-season-3-2025-episode-4.html" target="_blank" class="card">
+                <span class="name">Taxi Driver</span>
+                <span class="episode">Season 3</span>
+                <span class="tag watching">Dramacool</span>
+            </a>
+            <a href="https://asiaflix.net/drama/my-country-the-new-age/episode-1" target="_blank" class="card">
+                <span class="name">My Country: The New Age</span>
+                <span class="episode">Episode 1</span>
+                <span class="tag watching">Asiaflix</span>
+            </a>
+            <a href="https://ww5.myasiantv.rest/series/the-tale-of-lady-ok-2024-drama-10/" target="_blank" class="card">
+                <span class="name">The Tale of Lady Ok</span>
+                <span class="episode">2024</span>
+                <span class="tag watching">MyAsianTV</span>
+            </a>
+            <a href="https://asiaflix.net/drama/keys-to-the-heart/episode-1" target="_blank" class="card">
+                <span class="name">Keys to the Heart</span>
+                <span class="episode">Episode 1</span>
+                <span class="tag watching">Asiaflix</span>
+            </a>
+            <a href="https://goplay.su/3132353835323476/The-Art-of-Negotiation/Episode-3/" target="_blank" class="card">
+                <span class="name">The Art of Negotiation</span>
+                <span class="episode">Episode 3</span>
+                <span class="tag watching">GoPlay</span>
+            </a>
+            <a href="https://asiaflix.net/play/youth-of-may-1/6747501b35bdc245e40451d7/1" target="_blank" class="card">
+                <span class="name">Youth of May</span>
+                <span class="episode">Episode 1</span>
+                <span class="tag watching">Asiaflix</span>
+            </a>
+            <a href="https://asiaflix.net/drama/bleak-night-2/episode-1" target="_blank" class="card">
+                <span class="name">Bleak Night</span>
+                <span class="episode">Movie</span>
+                <span class="tag watching">Asiaflix</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="category">
+        <h2>In the Hopper</h2>
+        <div class="grid">
+            <a href="https://www.amazon.com/gp/video/detail/amzn1.dv.gti.c7768bf5-6fff-43bb-9d70-a34a4dd4d64b?autoplay=0&ref_=atv_cf_strg_wb" target="_blank" class="card">
+                <span class="name">Dahomey</span>
+                <span class="episode">Movie</span>
+                <span class="tag hopper">Amazon</span>
+            </a>
+            <a href="https://primeflix-vercel.com/movie/detail/11816" target="_blank" class="card">
+                <span class="name">On Golden Pond</span>
+                <span class="episode">Movie</span>
+                <span class="tag hopper">PrimeFlix</span>
+            </a>
+            <a href="https://primeflix-vercel.com/movie/detail/508883" target="_blank" class="card">
+                <span class="name">The Boy and the Heron</span>
+                <span class="episode">Movie</span>
+                <span class="tag hopper">PrimeFlix</span>
+            </a>
+            <a href="https://www.cineby.app/movie/1242434?play=true" target="_blank" class="card">
+                <span class="name">Highest 2 Lowest</span>
+                <span class="episode">Movie</span>
+                <span class="tag hopper">Cineby</span>
+            </a>
+            <a href="https://kisskh.co/Drama/365--Repeat-the-Year?id=148&q=true" target="_blank" class="card">
+                <span class="name">365: Repeat the Year</span>
+                <span class="episode">K-Drama</span>
+                <span class="tag hopper">KissKH</span>
+            </a>
+            <a href="https://xprime.tv/watch/639988" target="_blank" class="card">
+                <span class="name">어쩔수가 없다</span>
+                <span class="episode">Movie</span>
+                <span class="tag hopper">xPrime TV</span>
+            </a>
+        </div>
+    </div>
 
     <div class="category">
         <h2>Asian Drama & K-Drama</h2>
