@@ -210,6 +210,14 @@
             outline-offset: -2px;
         }
 
+        .card.drop-before {
+            box-shadow: -4px 0 0 #a0a8ff;
+        }
+
+        .card.drop-after {
+            box-shadow: 4px 0 0 #a0a8ff;
+        }
+
         /* Modal styles */
         .modal {
             display: none;
@@ -667,7 +675,9 @@
 
             return `
                 <div class="card" draggable="true" data-section="${section}" data-index="${index}"
-                     ondragstart="handleDragStart(event)" ondragend="handleDragEnd(event)">
+                     ondragstart="handleDragStart(event)" ondragend="handleDragEnd(event)"
+                     ondragover="handleCardDragOver(event)" ondragleave="handleCardDragLeave(event)"
+                     ondrop="handleCardDrop(event)">
                     <button class="delete-btn" onclick="deleteItem(event, '${section}', ${index})">×</button>
                     ${imageHtml}
                     <a href="${item.url}" target="_blank" class="card-content" style="text-decoration:none;color:inherit;">
@@ -787,6 +797,9 @@
                 draggedItem.classList.remove('dragging');
             }
             document.querySelectorAll('.grid').forEach(g => g.classList.remove('drag-over'));
+            document.querySelectorAll('.card').forEach(c => {
+                c.classList.remove('drop-before', 'drop-after');
+            });
             draggedItem = null;
             draggedSection = null;
             draggedIndex = null;
@@ -800,6 +813,72 @@
 
         function handleDragLeave(e) {
             e.currentTarget.classList.remove('drag-over');
+        }
+
+        // Card-level drag handlers for reordering within section
+        function handleCardDragOver(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const card = e.currentTarget;
+            if (card === draggedItem) return;
+
+            // Clear previous indicators
+            document.querySelectorAll('.card').forEach(c => {
+                c.classList.remove('drop-before', 'drop-after');
+            });
+
+            // Determine if dropping before or after based on mouse position
+            const rect = card.getBoundingClientRect();
+            const midX = rect.left + rect.width / 2;
+            if (e.clientX < midX) {
+                card.classList.add('drop-before');
+            } else {
+                card.classList.add('drop-after');
+            }
+        }
+
+        function handleCardDragLeave(e) {
+            e.currentTarget.classList.remove('drop-before', 'drop-after');
+        }
+
+        function handleCardDrop(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const targetCard = e.currentTarget;
+            const targetSection = targetCard.dataset.section;
+            const targetIndex = parseInt(targetCard.dataset.index);
+
+            if (!draggedSection || draggedItem === targetCard) return;
+
+            // Determine insert position
+            const rect = targetCard.getBoundingClientRect();
+            const midX = rect.left + rect.width / 2;
+            const insertBefore = e.clientX < midX;
+
+            // Remove from original position
+            const item = data[draggedSection].splice(draggedIndex, 1)[0];
+
+            // Calculate new index
+            let newIndex = targetIndex;
+            if (draggedSection === targetSection && draggedIndex < targetIndex) {
+                newIndex--; // Adjust for removal
+            }
+            if (!insertBefore) {
+                newIndex++;
+            }
+
+            // Insert at new position
+            data[targetSection].splice(newIndex, 0, item);
+
+            // Clear indicators
+            document.querySelectorAll('.card').forEach(c => {
+                c.classList.remove('drop-before', 'drop-after');
+            });
+            document.querySelectorAll('.grid').forEach(g => g.classList.remove('drag-over'));
+
+            saveToFirebase();
+            render();
+            setupDropZones();
         }
 
         function handleDrop(e) {
