@@ -19,12 +19,68 @@
             padding: 2rem;
         }
 
-        h1 {
-            text-align: center;
-            font-size: 2.5rem;
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
             color: #fff;
             text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .sync-btn {
+            background: rgba(34, 197, 94, 0.3);
+            color: #4ade80;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .sync-btn:hover {
+            background: rgba(34, 197, 94, 0.5);
+        }
+
+        .export-btn {
+            background: rgba(139, 92, 246, 0.3);
+            color: #a78bfa;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .export-btn:hover {
+            background: rgba(139, 92, 246, 0.5);
+        }
+
+        .edit-btn {
+            background: rgba(251, 191, 36, 0.3);
+            color: #fcd34d;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .edit-btn:hover {
+            background: rgba(251, 191, 36, 0.5);
         }
 
         .category {
@@ -95,14 +151,6 @@
             padding-right: 24px;
         }
 
-        .card .url {
-            font-size: 0.75rem;
-            color: #7f8c8d;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
         .card .episode {
             font-size: 0.85rem;
             color: #a0a8ff;
@@ -120,11 +168,6 @@
             width: fit-content;
         }
 
-        .card .tag.general { background: rgba(255, 159, 67, 0.3); color: #ffb347; }
-        .card .tag.asian { background: rgba(236, 72, 153, 0.3); color: #f472b6; }
-        .card .tag.video { background: rgba(34, 197, 94, 0.3); color: #4ade80; }
-        .card .tag.storage { background: rgba(139, 92, 246, 0.3); color: #a78bfa; }
-        .card .tag.premium { background: rgba(59, 130, 246, 0.3); color: #93c5fd; }
         .card .tag.watching { background: rgba(239, 68, 68, 0.3); color: #fca5a5; }
         .card .tag.hopper { background: rgba(251, 191, 36, 0.3); color: #fcd34d; }
 
@@ -196,7 +239,7 @@
             font-size: 0.9rem;
         }
 
-        .form-group input, .form-group select {
+        .form-group input {
             width: 100%;
             padding: 0.75rem;
             border-radius: 8px;
@@ -239,6 +282,31 @@
             background: rgba(99, 110, 255, 0.7);
         }
 
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(34, 197, 94, 0.9);
+            color: #fff;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            display: none;
+            z-index: 1001;
+        }
+
+        .toast.active {
+            display: block;
+            animation: fadeInOut 2s ease;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            15% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            85% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+        }
+
         footer {
             text-align: center;
             margin-top: 3rem;
@@ -250,11 +318,19 @@
             body { padding: 1rem; }
             h1 { font-size: 1.8rem; }
             .grid { grid-template-columns: 1fr; }
+            header { flex-direction: column; gap: 1rem; }
         }
     </style>
 </head>
 <body>
-    <h1>Media Dashboard</h1>
+    <header>
+        <h1>Media Dashboard</h1>
+        <div class="header-buttons">
+            <button class="sync-btn" onclick="syncFromGitHub()">↻ Sync</button>
+            <button class="export-btn" onclick="exportData()">↓ Export</button>
+            <a href="https://github.com/omatty123/media-dashboard/edit/main/data.json" target="_blank" class="edit-btn">✎ Edit on GitHub</a>
+        </div>
+    </header>
 
     <div class="category">
         <div class="category-header">
@@ -303,33 +379,28 @@
         </div>
     </div>
 
+    <div class="toast" id="toast"></div>
+
     <script>
-        // Default data
+        const GITHUB_DATA_URL = 'https://raw.githubusercontent.com/omatty123/media-dashboard/main/data.json';
+
+        // Default data (fallback)
         const defaultData = {
-            watching: [
-                { name: "The Pitt", url: "https://flixmomo.org/tv/250307/the-pitt/season/1?e=3&p=2", episode: "Season 1", source: "Flixmomo" },
-                { name: "Your Friends & Neighbors", url: "https://flixmomo.org/tv/241609/your-friends-neighbors/season/1?e=3&p=5", episode: "Season 1", source: "Flixmomo" },
-                { name: "Taxi Driver", url: "https://dramacool9.com.ro/taxi-driver-season-3-2025-episode-4.html", episode: "Season 3", source: "Dramacool" },
-                { name: "My Country: The New Age", url: "https://asiaflix.net/drama/my-country-the-new-age/episode-1", episode: "Episode 1", source: "Asiaflix" },
-                { name: "The Tale of Lady Ok", url: "https://ww5.myasiantv.rest/series/the-tale-of-lady-ok-2024-drama-10/", episode: "2024", source: "MyAsianTV" },
-                { name: "Keys to the Heart", url: "https://asiaflix.net/drama/keys-to-the-heart/episode-1", episode: "Episode 1", source: "Asiaflix" },
-                { name: "The Art of Negotiation", url: "https://goplay.su/3132353835323476/The-Art-of-Negotiation/Episode-3/", episode: "Episode 3", source: "GoPlay" },
-                { name: "Youth of May", url: "https://asiaflix.net/play/youth-of-may-1/6747501b35bdc245e40451d7/1", episode: "Episode 1", source: "Asiaflix" },
-                { name: "Bleak Night", url: "https://asiaflix.net/drama/bleak-night-2/episode-1", episode: "Movie", source: "Asiaflix" }
-            ],
-            hopper: [
-                { name: "Dahomey", url: "https://www.amazon.com/gp/video/detail/amzn1.dv.gti.c7768bf5-6fff-43bb-9d70-a34a4dd4d64b?autoplay=0&ref_=atv_cf_strg_wb", episode: "Movie", source: "Amazon" },
-                { name: "On Golden Pond", url: "https://primeflix-vercel.com/movie/detail/11816", episode: "Movie", source: "PrimeFlix" },
-                { name: "The Boy and the Heron", url: "https://primeflix-vercel.com/movie/detail/508883", episode: "Movie", source: "PrimeFlix" },
-                { name: "Highest 2 Lowest", url: "https://www.cineby.app/movie/1242434?play=true", episode: "Movie", source: "Cineby" },
-                { name: "365: Repeat the Year", url: "https://kisskh.co/Drama/365--Repeat-the-Year?id=148&q=true", episode: "K-Drama", source: "KissKH" },
-                { name: "어쩔수가 없다", url: "https://xprime.tv/watch/639988", episode: "Movie", source: "xPrime TV" }
-            ]
+            watching: [],
+            hopper: []
         };
 
         let currentSection = 'watching';
 
-        // Load data from localStorage or use defaults
+        // Show toast notification
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('active');
+            setTimeout(() => toast.classList.remove('active'), 2000);
+        }
+
+        // Load data from localStorage
         function loadData() {
             const stored = localStorage.getItem('mediaData');
             if (stored) {
@@ -343,11 +414,39 @@
             localStorage.setItem('mediaData', JSON.stringify(data));
         }
 
-        // Render dynamic sections (watching, hopper)
+        // Sync from GitHub
+        async function syncFromGitHub() {
+            try {
+                const response = await fetch(GITHUB_DATA_URL + '?t=' + Date.now());
+                if (response.ok) {
+                    const data = await response.json();
+                    saveData(data);
+                    renderDynamic();
+                    showToast('Synced from GitHub!');
+                } else {
+                    showToast('Failed to sync');
+                }
+            } catch (error) {
+                showToast('Sync error: ' + error.message);
+            }
+        }
+
+        // Export data to clipboard
+        function exportData() {
+            const data = loadData();
+            const json = JSON.stringify(data, null, 2);
+            navigator.clipboard.writeText(json).then(() => {
+                showToast('Data copied to clipboard!');
+            }).catch(() => {
+                // Fallback: show in prompt
+                prompt('Copy this data:', json);
+            });
+        }
+
+        // Render dynamic sections
         function renderDynamic() {
             const data = loadData();
 
-            // Render watching
             const watchingGrid = document.getElementById('watching-grid');
             watchingGrid.innerHTML = data.watching.map((item, index) => `
                 <a href="${item.url}" target="_blank" class="card">
@@ -358,7 +457,6 @@
                 </a>
             `).join('');
 
-            // Render hopper
             const hopperGrid = document.getElementById('hopper-grid');
             hopperGrid.innerHTML = data.hopper.map((item, index) => `
                 <a href="${item.url}" target="_blank" class="card">
@@ -403,6 +501,7 @@
             saveData(data);
             renderDynamic();
             closeModal();
+            showToast('Added! Click Export to save to GitHub');
         }
 
         function deleteItem(event, section, index) {
@@ -414,6 +513,7 @@
                 data[section].splice(index, 1);
                 saveData(data);
                 renderDynamic();
+                showToast('Removed! Click Export to save to GitHub');
             }
         }
 
@@ -426,8 +526,27 @@
             if (e.target.id === 'add-modal') closeModal();
         });
 
-        // Initialize
-        renderDynamic();
+        // Initialize: try to load from GitHub first, then use localStorage
+        async function init() {
+            const hasLocalData = localStorage.getItem('mediaData');
+
+            if (!hasLocalData) {
+                // First visit - load from GitHub
+                try {
+                    const response = await fetch(GITHUB_DATA_URL);
+                    if (response.ok) {
+                        const data = await response.json();
+                        saveData(data);
+                    }
+                } catch (error) {
+                    console.log('Could not fetch from GitHub, using defaults');
+                }
+            }
+
+            renderDynamic();
+        }
+
+        init();
     </script>
 </body>
 </html>
