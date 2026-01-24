@@ -572,6 +572,7 @@
         let currentSection = 'watching';
         let isConfigured = false;
         let selectedImageUrl = null;
+        let editingIndex = null; // null = adding new, number = editing existing
 
         // Check if Firebase is configured
         function checkFirebaseConfig() {
@@ -736,6 +737,7 @@
                      ondragover="handleCardDragOver(event)" ondragleave="handleCardDragLeave(event)"
                      ondrop="handleCardDrop(event)">
                     <button class="delete-btn" onclick="deleteItem(event, '${section}', ${index})">×</button>
+                    <button class="delete-btn" style="right:36px;color:#a0a8ff;" onclick="editItem(event, '${section}', ${index})">✎</button>
                     ${imageHtml}
                     <a href="${item.url}" target="_blank" class="card-content" style="text-decoration:none;color:inherit;">
                         <span class="name">${item.name}</span>
@@ -963,10 +965,36 @@
         // Modal functions
         function openModal(section) {
             currentSection = section;
+            editingIndex = null;
             document.getElementById('modal-title').textContent =
                 section === 'watching' ? 'Add to Currently Watching' : 'Add to Hopper';
             document.getElementById('add-modal').classList.add('active');
             document.getElementById('item-name').focus();
+        }
+
+        function editItem(event, section, index) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            const item = data[section][index];
+            currentSection = section;
+            editingIndex = index;
+
+            document.getElementById('modal-title').textContent = 'Edit Item';
+            document.getElementById('item-name').value = item.name || '';
+            document.getElementById('item-url').value = item.url || '';
+            document.getElementById('item-episode').value = item.episode || '';
+            document.getElementById('item-source').value = item.source || '';
+
+            // Show current image if exists
+            if (item.image) {
+                selectedImageUrl = item.image;
+                const preview = document.getElementById('selected-image');
+                preview.innerHTML = `<img src="${item.image}"><span>Current image (search to change)</span>`;
+                preview.style.display = 'flex';
+            }
+
+            document.getElementById('add-modal').classList.add('active');
         }
 
         function closeModal() {
@@ -975,6 +1003,7 @@
             document.getElementById('item-url').value = '';
             document.getElementById('item-episode').value = '';
             document.getElementById('item-source').value = '';
+            editingIndex = null;
             clearImageSelection();
         }
 
@@ -994,7 +1023,14 @@
                 item.image = selectedImageUrl;
             }
 
-            data[currentSection].push(item);
+            if (editingIndex !== null) {
+                // Editing existing item
+                data[currentSection][editingIndex] = item;
+            } else {
+                // Adding new item
+                data[currentSection].push(item);
+            }
+
             saveToFirebase();
             render();
             closeModal();
