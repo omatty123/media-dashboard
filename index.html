@@ -159,6 +159,38 @@
 
         .card .tag.watching { background: rgba(239, 68, 68, 0.3); color: #fca5a5; }
         .card .tag.hopper { background: rgba(251, 191, 36, 0.3); color: #fcd34d; }
+        .card .tag.watched { background: rgba(34, 197, 94, 0.3); color: #4ade80; }
+
+        /* Smaller cards for Watched section */
+        #watched-grid {
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        }
+
+        #watched-grid .card {
+            font-size: 0.85rem;
+        }
+
+        #watched-grid .card-image {
+            height: 80px;
+        }
+
+        #watched-grid .card-content {
+            padding: 0.6rem;
+            gap: 0.2rem;
+        }
+
+        #watched-grid .card .name {
+            font-size: 0.85rem;
+        }
+
+        #watched-grid .card .episode {
+            font-size: 0.7rem;
+        }
+
+        #watched-grid .card .tag {
+            font-size: 0.6rem;
+            padding: 0.15rem 0.4rem;
+        }
 
         .delete-btn {
             position: absolute;
@@ -493,6 +525,14 @@
         <div class="grid" id="hopper-grid" data-section="hopper"></div>
     </div>
 
+    <div class="category">
+        <div class="category-header">
+            <h2>Watched</h2>
+            <button class="add-btn" onclick="openModal('watched')">+ Add</button>
+        </div>
+        <div class="grid" id="watched-grid" data-section="watched"></div>
+    </div>
+
     <footer>
         <p>Media Dashboard</p>
     </footer>
@@ -568,7 +608,7 @@
         const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p/w300';
 
         let db = null;
-        let data = { watching: [], hopper: [] };
+        let data = { watching: [], hopper: [], watched: [] };
         let currentSection = 'watching';
         let isConfigured = false;
         let selectedImageUrl = null;
@@ -601,6 +641,7 @@
                         data = val;
                         if (!data.watching) data.watching = [];
                         if (!data.hopper) data.hopper = [];
+                        if (!data.watched) data.watched = [];
                     }
                     render();
                     setStatus('Connected', 'online');
@@ -658,6 +699,7 @@
         function render() {
             const watchingGrid = document.getElementById('watching-grid');
             const hopperGrid = document.getElementById('hopper-grid');
+            const watchedGrid = document.getElementById('watched-grid');
 
             if (data.watching.length === 0) {
                 watchingGrid.innerHTML = '<div class="empty-state">No shows yet. Click + Add or drag here!</div>';
@@ -671,8 +713,14 @@
                 hopperGrid.innerHTML = data.hopper.map((item, index) => renderCard(item, 'hopper', index)).join('');
             }
 
+            if (data.watched.length === 0) {
+                watchedGrid.innerHTML = '<div class="empty-state">Nothing watched yet. Drag finished shows here!</div>';
+            } else {
+                watchedGrid.innerHTML = data.watched.map((item, index) => renderCard(item, 'watched', index)).join('');
+            }
+
             // Show "Fetch Images" button if any items lack images
-            const hasItemsWithoutImages = [...data.watching, ...data.hopper].some(item => !item.image);
+            const hasItemsWithoutImages = [...data.watching, ...data.hopper, ...data.watched].some(item => !item.image);
             document.getElementById('fetch-images-btn').style.display = hasItemsWithoutImages ? 'block' : 'none';
         }
 
@@ -684,7 +732,8 @@
 
             const allItems = [
                 ...data.watching.map((item, i) => ({ item, section: 'watching', index: i })),
-                ...data.hopper.map((item, i) => ({ item, section: 'hopper', index: i }))
+                ...data.hopper.map((item, i) => ({ item, section: 'hopper', index: i })),
+                ...data.watched.map((item, i) => ({ item, section: 'watched', index: i }))
             ].filter(({ item }) => !item.image);
 
             let updated = 0;
@@ -966,8 +1015,12 @@
         function openModal(section) {
             currentSection = section;
             editingIndex = null;
-            document.getElementById('modal-title').textContent =
-                section === 'watching' ? 'Add to Currently Watching' : 'Add to Hopper';
+            const titles = {
+                watching: 'Add to Currently Watching',
+                hopper: 'Add to Hopper',
+                watched: 'Add to Watched'
+            };
+            document.getElementById('modal-title').textContent = titles[section] || 'Add Item';
             document.getElementById('add-modal').classList.add('active');
             document.getElementById('item-name').focus();
         }
