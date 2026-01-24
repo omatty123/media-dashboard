@@ -31,14 +31,35 @@
             margin-bottom: 2.5rem;
         }
 
-        .category h2 {
-            font-size: 1.3rem;
-            color: #a4b0be;
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 1rem;
             padding-bottom: 0.5rem;
             border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .category h2 {
+            font-size: 1.3rem;
+            color: #a4b0be;
             text-transform: uppercase;
             letter-spacing: 2px;
+        }
+
+        .add-btn {
+            background: rgba(99, 110, 255, 0.3);
+            color: #a0a8ff;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .add-btn:hover {
+            background: rgba(99, 110, 255, 0.5);
         }
 
         .grid {
@@ -58,6 +79,7 @@
             display: flex;
             flex-direction: column;
             gap: 0.5rem;
+            position: relative;
         }
 
         .card:hover {
@@ -70,6 +92,7 @@
         .card .name {
             font-weight: 600;
             font-size: 1.1rem;
+            padding-right: 24px;
         }
 
         .card .url {
@@ -78,6 +101,12 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+        }
+
+        .card .episode {
+            font-size: 0.85rem;
+            color: #a0a8ff;
+            font-weight: 500;
         }
 
         .card .tag {
@@ -99,10 +128,115 @@
         .card .tag.watching { background: rgba(239, 68, 68, 0.3); color: #fca5a5; }
         .card .tag.hopper { background: rgba(251, 191, 36, 0.3); color: #fcd34d; }
 
-        .card .episode {
-            font-size: 0.85rem;
-            color: #a0a8ff;
-            font-weight: 500;
+        .delete-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+            border: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+            line-height: 1;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .card:hover .delete-btn {
+            opacity: 1;
+        }
+
+        .delete-btn:hover {
+            background: rgba(239, 68, 68, 0.6);
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #1a1a2e;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .modal h3 {
+            margin-bottom: 1.5rem;
+            color: #fff;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #a4b0be;
+            font-size: 0.9rem;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-size: 1rem;
+        }
+
+        .form-group input::placeholder {
+            color: #7f8c8d;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+            padding: 0.75rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn-cancel {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+
+        .btn-save {
+            background: rgba(99, 110, 255, 0.5);
+            color: #fff;
+        }
+
+        .btn-save:hover {
+            background: rgba(99, 110, 255, 0.7);
         }
 
         footer {
@@ -123,249 +257,177 @@
     <h1>Media Dashboard</h1>
 
     <div class="category">
-        <h2>Currently Watching</h2>
-        <div class="grid">
-            <a href="https://flixmomo.org/tv/250307/the-pitt/season/1?e=3&p=2" target="_blank" class="card">
-                <span class="name">The Pitt</span>
-                <span class="episode">Season 1</span>
-                <span class="tag watching">Flixmomo</span>
-            </a>
-            <a href="https://flixmomo.org/tv/241609/your-friends-neighbors/season/1?e=3&p=5" target="_blank" class="card">
-                <span class="name">Your Friends & Neighbors</span>
-                <span class="episode">Season 1</span>
-                <span class="tag watching">Flixmomo</span>
-            </a>
-            <a href="https://dramacool9.com.ro/taxi-driver-season-3-2025-episode-4.html" target="_blank" class="card">
-                <span class="name">Taxi Driver</span>
-                <span class="episode">Season 3</span>
-                <span class="tag watching">Dramacool</span>
-            </a>
-            <a href="https://asiaflix.net/drama/my-country-the-new-age/episode-1" target="_blank" class="card">
-                <span class="name">My Country: The New Age</span>
-                <span class="episode">Episode 1</span>
-                <span class="tag watching">Asiaflix</span>
-            </a>
-            <a href="https://ww5.myasiantv.rest/series/the-tale-of-lady-ok-2024-drama-10/" target="_blank" class="card">
-                <span class="name">The Tale of Lady Ok</span>
-                <span class="episode">2024</span>
-                <span class="tag watching">MyAsianTV</span>
-            </a>
-            <a href="https://asiaflix.net/drama/keys-to-the-heart/episode-1" target="_blank" class="card">
-                <span class="name">Keys to the Heart</span>
-                <span class="episode">Episode 1</span>
-                <span class="tag watching">Asiaflix</span>
-            </a>
-            <a href="https://goplay.su/3132353835323476/The-Art-of-Negotiation/Episode-3/" target="_blank" class="card">
-                <span class="name">The Art of Negotiation</span>
-                <span class="episode">Episode 3</span>
-                <span class="tag watching">GoPlay</span>
-            </a>
-            <a href="https://asiaflix.net/play/youth-of-may-1/6747501b35bdc245e40451d7/1" target="_blank" class="card">
-                <span class="name">Youth of May</span>
-                <span class="episode">Episode 1</span>
-                <span class="tag watching">Asiaflix</span>
-            </a>
-            <a href="https://asiaflix.net/drama/bleak-night-2/episode-1" target="_blank" class="card">
-                <span class="name">Bleak Night</span>
-                <span class="episode">Movie</span>
-                <span class="tag watching">Asiaflix</span>
-            </a>
+        <div class="category-header">
+            <h2>Currently Watching</h2>
+            <button class="add-btn" onclick="openModal('watching')">+ Add</button>
         </div>
+        <div class="grid" id="watching-grid"></div>
     </div>
 
     <div class="category">
-        <h2>In the Hopper</h2>
-        <div class="grid">
-            <a href="https://www.amazon.com/gp/video/detail/amzn1.dv.gti.c7768bf5-6fff-43bb-9d70-a34a4dd4d64b?autoplay=0&ref_=atv_cf_strg_wb" target="_blank" class="card">
-                <span class="name">Dahomey</span>
-                <span class="episode">Movie</span>
-                <span class="tag hopper">Amazon</span>
-            </a>
-            <a href="https://primeflix-vercel.com/movie/detail/11816" target="_blank" class="card">
-                <span class="name">On Golden Pond</span>
-                <span class="episode">Movie</span>
-                <span class="tag hopper">PrimeFlix</span>
-            </a>
-            <a href="https://primeflix-vercel.com/movie/detail/508883" target="_blank" class="card">
-                <span class="name">The Boy and the Heron</span>
-                <span class="episode">Movie</span>
-                <span class="tag hopper">PrimeFlix</span>
-            </a>
-            <a href="https://www.cineby.app/movie/1242434?play=true" target="_blank" class="card">
-                <span class="name">Highest 2 Lowest</span>
-                <span class="episode">Movie</span>
-                <span class="tag hopper">Cineby</span>
-            </a>
-            <a href="https://kisskh.co/Drama/365--Repeat-the-Year?id=148&q=true" target="_blank" class="card">
-                <span class="name">365: Repeat the Year</span>
-                <span class="episode">K-Drama</span>
-                <span class="tag hopper">KissKH</span>
-            </a>
-            <a href="https://xprime.tv/watch/639988" target="_blank" class="card">
-                <span class="name">어쩔수가 없다</span>
-                <span class="episode">Movie</span>
-                <span class="tag hopper">xPrime TV</span>
-            </a>
+        <div class="category-header">
+            <h2>In the Hopper</h2>
+            <button class="add-btn" onclick="openModal('hopper')">+ Add</button>
         </div>
-    </div>
-
-    <div class="category">
-        <h2>Asian Drama & K-Drama</h2>
-        <div class="grid">
-            <a href="https://asiaflix.net/" target="_blank" class="card">
-                <span class="name">Asiaflix</span>
-                <span class="url">asiaflix.net</span>
-                <span class="tag asian">K-Drama</span>
-            </a>
-            <a href="https://kissasian.org.za/" target="_blank" class="card">
-                <span class="name">KissAsian</span>
-                <span class="url">kissasian.org.za</span>
-                <span class="tag asian">Asian Drama</span>
-            </a>
-            <a href="https://kissasiantv.la/" target="_blank" class="card">
-                <span class="name">KissAsian TV</span>
-                <span class="url">kissasiantv.la</span>
-                <span class="tag asian">Asian Drama</span>
-            </a>
-            <a href="https://kissasian.pe/" target="_blank" class="card">
-                <span class="name">KissAsian PE</span>
-                <span class="url">kissasian.pe</span>
-                <span class="tag asian">Asian Drama</span>
-            </a>
-            <a href="https://www.watchasiann.de/" target="_blank" class="card">
-                <span class="name">WatchAsian</span>
-                <span class="url">watchasiann.de</span>
-                <span class="tag asian">Asian Drama</span>
-            </a>
-            <a href="https://ww5.myasiantv.rest/" target="_blank" class="card">
-                <span class="name">MyAsianTV</span>
-                <span class="url">myasiantv.rest</span>
-                <span class="tag asian">Asian Drama</span>
-            </a>
-            <a href="https://dramacool9.com.ro/" target="_blank" class="card">
-                <span class="name">Dramacool</span>
-                <span class="url">dramacool9.com.ro</span>
-                <span class="tag asian">K-Drama</span>
-            </a>
-            <a href="https://kisskh.co/" target="_blank" class="card">
-                <span class="name">KissKH</span>
-                <span class="url">kisskh.co</span>
-                <span class="tag asian">Asian Drama</span>
-            </a>
-            <a href="https://goplay.su/" target="_blank" class="card">
-                <span class="name">GoPlay</span>
-                <span class="url">goplay.su</span>
-                <span class="tag asian">K-Drama</span>
-            </a>
-        </div>
-    </div>
-
-    <div class="category">
-        <h2>Movies & TV Shows</h2>
-        <div class="grid">
-            <a href="https://rivestream.org/" target="_blank" class="card">
-                <span class="name">Rive</span>
-                <span class="url">rivestream.org</span>
-                <span class="tag general">Movies & TV</span>
-            </a>
-            <a href="https://flixmomo.org/" target="_blank" class="card">
-                <span class="name">Flixmomo</span>
-                <span class="url">flixmomo.org</span>
-                <span class="tag general">Movies & TV</span>
-            </a>
-            <a href="https://bingeflix.tv/" target="_blank" class="card">
-                <span class="name">Bingeflix</span>
-                <span class="url">bingeflix.tv</span>
-                <span class="tag general">Movies & TV</span>
-            </a>
-            <a href="https://bingeflex.vercel.app/" target="_blank" class="card">
-                <span class="name">Bingeflex</span>
-                <span class="url">bingeflex.vercel.app</span>
-                <span class="tag general">Movies & TV</span>
-            </a>
-            <a href="https://primeflix-vercel.com/" target="_blank" class="card">
-                <span class="name">PrimeFlix</span>
-                <span class="url">primeflix-vercel.com</span>
-                <span class="tag general">Movies & TV</span>
-            </a>
-            <a href="https://xprime.today/" target="_blank" class="card">
-                <span class="name">xPrime</span>
-                <span class="url">xprime.today</span>
-                <span class="tag general">Movies & TV</span>
-            </a>
-            <a href="https://xprime.tv/" target="_blank" class="card">
-                <span class="name">xPrime TV</span>
-                <span class="url">xprime.tv</span>
-                <span class="tag general">Movies & TV</span>
-            </a>
-            <a href="https://www.cineby.app/" target="_blank" class="card">
-                <span class="name">Cineby</span>
-                <span class="url">cineby.app</span>
-                <span class="tag general">Movies & TV</span>
-            </a>
-            <a href="https://flixer.su/" target="_blank" class="card">
-                <span class="name">Flixer</span>
-                <span class="url">flixer.su</span>
-                <span class="tag general">Movies & TV</span>
-            </a>
-        </div>
-    </div>
-
-    <div class="category">
-        <h2>Premium Streaming</h2>
-        <div class="grid">
-            <a href="https://www.amazon.com/gp/video/" target="_blank" class="card">
-                <span class="name">Amazon Prime Video</span>
-                <span class="url">amazon.com/video</span>
-                <span class="tag premium">Subscription</span>
-            </a>
-        </div>
-    </div>
-
-    <div class="category">
-        <h2>Video Platforms</h2>
-        <div class="grid">
-            <a href="https://www.youtube.com/" target="_blank" class="card">
-                <span class="name">YouTube</span>
-                <span class="url">youtube.com</span>
-                <span class="tag video">Video</span>
-            </a>
-            <a href="https://www.bilibili.com/" target="_blank" class="card">
-                <span class="name">Bilibili</span>
-                <span class="url">bilibili.com</span>
-                <span class="tag video">Chinese Video</span>
-            </a>
-            <a href="https://vimeo.com/" target="_blank" class="card">
-                <span class="name">Vimeo</span>
-                <span class="url">vimeo.com</span>
-                <span class="tag video">Video</span>
-            </a>
-            <a href="https://www.dailymotion.com/" target="_blank" class="card">
-                <span class="name">Dailymotion</span>
-                <span class="url">dailymotion.com</span>
-                <span class="tag video">Video</span>
-            </a>
-        </div>
-    </div>
-
-    <div class="category">
-        <h2>Cloud Storage</h2>
-        <div class="grid">
-            <a href="https://gofile.io/" target="_blank" class="card">
-                <span class="name">Gofile</span>
-                <span class="url">gofile.io</span>
-                <span class="tag storage">Cloud Storage</span>
-            </a>
-            <a href="https://app.koofr.net/" target="_blank" class="card">
-                <span class="name">Koofr</span>
-                <span class="url">koofr.net</span>
-                <span class="tag storage">My Videos</span>
-            </a>
-        </div>
+        <div class="grid" id="hopper-grid"></div>
     </div>
 
     <footer>
         <p>Media Dashboard</p>
     </footer>
+
+    <!-- Add Modal -->
+    <div class="modal" id="add-modal">
+        <div class="modal-content">
+            <h3 id="modal-title">Add to Currently Watching</h3>
+            <div class="form-group">
+                <label>Title</label>
+                <input type="text" id="item-name" placeholder="Show or movie name">
+            </div>
+            <div class="form-group">
+                <label>URL</label>
+                <input type="text" id="item-url" placeholder="https://...">
+            </div>
+            <div class="form-group">
+                <label>Episode/Info</label>
+                <input type="text" id="item-episode" placeholder="Season 1, Episode 3, Movie, etc.">
+            </div>
+            <div class="form-group">
+                <label>Source</label>
+                <input type="text" id="item-source" placeholder="Flixmomo, Asiaflix, etc.">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+                <button class="btn-save" onclick="saveItem()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Default data
+        const defaultData = {
+            watching: [
+                { name: "The Pitt", url: "https://flixmomo.org/tv/250307/the-pitt/season/1?e=3&p=2", episode: "Season 1", source: "Flixmomo" },
+                { name: "Your Friends & Neighbors", url: "https://flixmomo.org/tv/241609/your-friends-neighbors/season/1?e=3&p=5", episode: "Season 1", source: "Flixmomo" },
+                { name: "Taxi Driver", url: "https://dramacool9.com.ro/taxi-driver-season-3-2025-episode-4.html", episode: "Season 3", source: "Dramacool" },
+                { name: "My Country: The New Age", url: "https://asiaflix.net/drama/my-country-the-new-age/episode-1", episode: "Episode 1", source: "Asiaflix" },
+                { name: "The Tale of Lady Ok", url: "https://ww5.myasiantv.rest/series/the-tale-of-lady-ok-2024-drama-10/", episode: "2024", source: "MyAsianTV" },
+                { name: "Keys to the Heart", url: "https://asiaflix.net/drama/keys-to-the-heart/episode-1", episode: "Episode 1", source: "Asiaflix" },
+                { name: "The Art of Negotiation", url: "https://goplay.su/3132353835323476/The-Art-of-Negotiation/Episode-3/", episode: "Episode 3", source: "GoPlay" },
+                { name: "Youth of May", url: "https://asiaflix.net/play/youth-of-may-1/6747501b35bdc245e40451d7/1", episode: "Episode 1", source: "Asiaflix" },
+                { name: "Bleak Night", url: "https://asiaflix.net/drama/bleak-night-2/episode-1", episode: "Movie", source: "Asiaflix" }
+            ],
+            hopper: [
+                { name: "Dahomey", url: "https://www.amazon.com/gp/video/detail/amzn1.dv.gti.c7768bf5-6fff-43bb-9d70-a34a4dd4d64b?autoplay=0&ref_=atv_cf_strg_wb", episode: "Movie", source: "Amazon" },
+                { name: "On Golden Pond", url: "https://primeflix-vercel.com/movie/detail/11816", episode: "Movie", source: "PrimeFlix" },
+                { name: "The Boy and the Heron", url: "https://primeflix-vercel.com/movie/detail/508883", episode: "Movie", source: "PrimeFlix" },
+                { name: "Highest 2 Lowest", url: "https://www.cineby.app/movie/1242434?play=true", episode: "Movie", source: "Cineby" },
+                { name: "365: Repeat the Year", url: "https://kisskh.co/Drama/365--Repeat-the-Year?id=148&q=true", episode: "K-Drama", source: "KissKH" },
+                { name: "어쩔수가 없다", url: "https://xprime.tv/watch/639988", episode: "Movie", source: "xPrime TV" }
+            ]
+        };
+
+        let currentSection = 'watching';
+
+        // Load data from localStorage or use defaults
+        function loadData() {
+            const stored = localStorage.getItem('mediaData');
+            if (stored) {
+                return JSON.parse(stored);
+            }
+            return defaultData;
+        }
+
+        // Save data to localStorage
+        function saveData(data) {
+            localStorage.setItem('mediaData', JSON.stringify(data));
+        }
+
+        // Render dynamic sections (watching, hopper)
+        function renderDynamic() {
+            const data = loadData();
+
+            // Render watching
+            const watchingGrid = document.getElementById('watching-grid');
+            watchingGrid.innerHTML = data.watching.map((item, index) => `
+                <a href="${item.url}" target="_blank" class="card">
+                    <button class="delete-btn" onclick="deleteItem(event, 'watching', ${index})">×</button>
+                    <span class="name">${item.name}</span>
+                    <span class="episode">${item.episode}</span>
+                    <span class="tag watching">${item.source}</span>
+                </a>
+            `).join('');
+
+            // Render hopper
+            const hopperGrid = document.getElementById('hopper-grid');
+            hopperGrid.innerHTML = data.hopper.map((item, index) => `
+                <a href="${item.url}" target="_blank" class="card">
+                    <button class="delete-btn" onclick="deleteItem(event, 'hopper', ${index})">×</button>
+                    <span class="name">${item.name}</span>
+                    <span class="episode">${item.episode}</span>
+                    <span class="tag hopper">${item.source}</span>
+                </a>
+            `).join('');
+        }
+
+        // Modal functions
+        function openModal(section) {
+            currentSection = section;
+            document.getElementById('modal-title').textContent =
+                section === 'watching' ? 'Add to Currently Watching' : 'Add to Hopper';
+            document.getElementById('add-modal').classList.add('active');
+            document.getElementById('item-name').focus();
+        }
+
+        function closeModal() {
+            document.getElementById('add-modal').classList.remove('active');
+            document.getElementById('item-name').value = '';
+            document.getElementById('item-url').value = '';
+            document.getElementById('item-episode').value = '';
+            document.getElementById('item-source').value = '';
+        }
+
+        function saveItem() {
+            const name = document.getElementById('item-name').value.trim();
+            const url = document.getElementById('item-url').value.trim();
+            const episode = document.getElementById('item-episode').value.trim() || 'Episode 1';
+            const source = document.getElementById('item-source').value.trim() || 'Unknown';
+
+            if (!name || !url) {
+                alert('Please enter a title and URL');
+                return;
+            }
+
+            const data = loadData();
+            data[currentSection].push({ name, url, episode, source });
+            saveData(data);
+            renderDynamic();
+            closeModal();
+        }
+
+        function deleteItem(event, section, index) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (confirm('Remove this item?')) {
+                const data = loadData();
+                data[section].splice(index, 1);
+                saveData(data);
+                renderDynamic();
+            }
+        }
+
+        // Close modal on escape or click outside
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        document.getElementById('add-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'add-modal') closeModal();
+        });
+
+        // Initialize
+        renderDynamic();
+    </script>
 </body>
 </html>
