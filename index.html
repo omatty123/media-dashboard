@@ -812,7 +812,7 @@
                 <label>Title</label>
                 <div class="search-row">
                     <input type="text" id="item-name" placeholder="Show or movie name" oninput="clearImageSelection()">
-                    <button class="search-btn" onclick="searchImages()" id="search-btn">Search</button>
+                    <button type="button" class="search-btn" onclick="searchImages()" id="search-btn">Search</button>
                 </div>
                 <div class="image-results" id="image-results"></div>
                 <div class="selected-image" id="selected-image" style="display:none;"></div>
@@ -823,16 +823,16 @@
             <div class="find-links-section">
                 <h4>Find Streaming Links</h4>
                 <div class="site-buttons" id="site-buttons">
-                    <button class="site-btn" onclick="searchSite('flixmomo')">Flixmomo</button>
-                    <button class="site-btn" onclick="searchSite('asiaflix')">Asiaflix</button>
-                    <button class="site-btn" onclick="searchSite('dramacool')">Dramacool</button>
-                    <button class="site-btn" onclick="searchSite('myasiantv')">MyAsianTV</button>
-                    <button class="site-btn" onclick="searchSite('kisskh')">KissKH</button>
-                    <button class="site-btn" onclick="searchSite('goplay')">GoPlay</button>
-                    <button class="site-btn" onclick="searchSite('primeflix')">PrimeFlix</button>
-                    <button class="site-btn" onclick="searchSite('cineby')">Cineby</button>
-                    <button class="site-btn" onclick="searchSite('netflix')">Netflix</button>
-                    <button class="site-btn" onclick="searchSite('amazon')">Amazon</button>
+                    <button type="button" class="site-btn" onclick="searchSite('flixmomo')">Flixmomo</button>
+                    <button type="button" class="site-btn" onclick="searchSite('asiaflix')">Asiaflix</button>
+                    <button type="button" class="site-btn" onclick="searchSite('dramacool')">Dramacool</button>
+                    <button type="button" class="site-btn" onclick="searchSite('myasiantv')">MyAsianTV</button>
+                    <button type="button" class="site-btn" onclick="searchSite('kisskh')">KissKH</button>
+                    <button type="button" class="site-btn" onclick="searchSite('goplay')">GoPlay</button>
+                    <button type="button" class="site-btn" onclick="searchSite('primeflix')">PrimeFlix</button>
+                    <button type="button" class="site-btn" onclick="searchSite('cineby')">Cineby</button>
+                    <button type="button" class="site-btn" onclick="searchSite('netflix')">Netflix</button>
+                    <button type="button" class="site-btn" onclick="searchSite('amazon')">Amazon</button>
                 </div>
                 <p class="find-links-hint">Enter title above, click a site to search. Copy the URL back here.</p>
             </div>
@@ -849,8 +849,8 @@
                 <input type="text" id="item-source" placeholder="Flixmomo, Asiaflix, etc.">
             </div>
             <div class="modal-buttons">
-                <button class="btn-cancel" onclick="closeModal()">Cancel</button>
-                <button class="btn-save" onclick="saveItem()">Save</button>
+                <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
+                <button type="button" class="btn-save" onclick="saveItem()">Save</button>
             </div>
         </div>
     </div>
@@ -1054,6 +1054,19 @@
                 ? `<img class="card-image" src="${item.image}" alt="${item.name}" onerror="this.outerHTML='<div class=\\'card-image placeholder\\'>🎬</div>'">`
                 : `<div class="card-image placeholder">🎬</div>`;
 
+            const cardBody = `
+                ${imageHtml}
+                <div class="card-content">
+                    <span class="name">${item.name}</span>
+                    <span class="episode">${item.episode}</span>
+                    <span class="tag ${section}">${item.source}</span>
+                </div>
+            `;
+
+            const cardLink = item.url
+                ? `<a href="${item.url}" target="_blank" class="card-link">${cardBody}</a>`
+                : `<div class="card-link">${cardBody}</div>`;
+
             return `
                 <div class="card" draggable="true" data-section="${section}" data-index="${index}"
                      ondragstart="handleDragStart(event)" ondragend="handleDragEnd(event)"
@@ -1061,14 +1074,7 @@
                      ondrop="handleCardDrop(event)">
                     <button class="delete-btn" onclick="deleteItem(event, '${section}', ${index})">×</button>
                     <button class="delete-btn" style="right:36px;color:#a0a8ff;" onclick="editItem(event, '${section}', ${index})">✎</button>
-                    <a href="${item.url}" target="_blank" class="card-link">
-                        ${imageHtml}
-                        <div class="card-content">
-                            <span class="name">${item.name}</span>
-                            <span class="episode">${item.episode}</span>
-                            <span class="tag ${section}">${item.source}</span>
-                        </div>
-                    </a>
+                    ${cardLink}
                 </div>
             `;
         }
@@ -1389,8 +1395,8 @@
             const episode = document.getElementById('item-episode').value.trim() || 'Episode 1';
             const source = document.getElementById('item-source').value.trim() || 'Unknown';
 
-            if (!name || !url) {
-                alert('Please enter a title and URL');
+            if (!name) {
+                alert('Please enter a title');
                 return;
             }
 
