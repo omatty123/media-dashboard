@@ -178,6 +178,11 @@
             color: #fcd34d;
         }
 
+        .status.local {
+            background: rgba(251, 191, 36, 0.16);
+            color: #fcd34d;
+        }
+
         .category {
             margin-bottom: 2.5rem;
         }
@@ -335,6 +340,10 @@
         }
 
         #watched-grid .card-image {
+            height: 190px;
+        }
+
+        #collections-grid .card-image {
             height: 190px;
         }
 
@@ -777,6 +786,10 @@
                 <span class="nav-icon">✓</span>
                 <span class="nav-label">Watched</span>
             </a>
+            <a href="#collections" class="nav-item" onclick="scrollToSection('collections')">
+                <span class="nav-icon">◎</span>
+                <span class="nav-label">Collections</span>
+            </a>
         </nav>
         <div style="margin-top:auto;">
             <span class="status" id="status">Connecting...</span>
@@ -816,6 +829,23 @@
                 <span class="item-count" id="watched-count"></span>
             </div>
             <div class="grid" id="watched-grid" data-section="watched"></div>
+        </div>
+
+        <div class="category" id="collections">
+            <div class="category-header">
+                <h2>Collections</h2>
+                <span class="item-count">1 site</span>
+            </div>
+            <div class="grid" id="collections-grid">
+                <a class="card card-link" href="https://omatty123.github.io/summer-culture-site/" target="_blank" rel="noopener">
+                    <img class="card-image" src="https://omatty123.github.io/summer-culture-site/assets/war-and-peace-cover.jpg" alt="War and Peace cover">
+                    <div class="card-content">
+                        <span class="name">Summer Culture Materials</span>
+                        <span class="episode">War and Peace / Soviet World War II Cinema</span>
+                        <span class="tag hopper">GitHub Pages</span>
+                    </div>
+                </a>
+            </div>
         </div>
     </main>
 
@@ -931,14 +961,18 @@
                     render();
                     setStatus('Connected', 'online');
                 }, (error) => {
-                    console.error('Firebase error:', error);
-                    setStatus('Error', 'offline');
+                    console.warn('Firebase unavailable; using local/static data:', error);
+                    isConfigured = false;
+                    db = null;
+                    setStatus('Local fallback', 'local');
                     loadFromLocalStorage();
                 });
 
             } catch (error) {
-                console.error('Firebase init error:', error);
-                setStatus('Error', 'offline');
+                console.warn('Firebase unavailable; using local/static data:', error);
+                isConfigured = false;
+                db = null;
+                setStatus('Local fallback', 'local');
                 loadFromLocalStorage();
             }
         }
@@ -949,6 +983,7 @@
             status.className = 'status';
             if (state === 'offline') status.classList.add('offline');
             if (state === 'saving') status.classList.add('saving');
+            if (state === 'local') status.classList.add('local');
         }
 
         function saveToFirebase() {
@@ -957,9 +992,13 @@
                 db.ref('media').set(data)
                     .then(() => setStatus('Saved', 'online'))
                     .catch(err => {
-                        console.error('Save error:', err);
-                        setStatus('Save failed', 'offline');
+                        console.warn('Firebase save unavailable; saved locally:', err);
+                        isConfigured = false;
+                        db = null;
+                        setStatus('Local only', 'local');
                     });
+            } else {
+                setStatus('Local only', 'local');
             }
             localStorage.setItem('mediaData', JSON.stringify(data));
         }
