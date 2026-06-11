@@ -325,6 +325,44 @@
         .card .tag.hopper { background: rgba(160, 168, 255, 0.2); color: var(--accent-secondary); }
         .card .tag.watched { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
 
+        .move-actions {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.4rem;
+            padding: 0 1rem 1rem;
+        }
+
+        .move-btn {
+            min-height: 32px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-family: var(--font-body);
+            font-size: 0.74rem;
+            font-weight: 700;
+            transition: all 0.15s ease;
+        }
+
+        .move-btn:hover {
+            color: var(--text-primary);
+            border-color: var(--accent-primary);
+            background: rgba(139, 92, 246, 0.15);
+        }
+
+        .move-btn.move-watched {
+            color: #86efac;
+        }
+
+        .move-btn.move-watching {
+            color: #c4b5fd;
+        }
+
+        .move-btn.move-hopper {
+            color: var(--accent-secondary);
+        }
+
         /* Smaller cards for Watched section */
         #watched-grid {
             grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
@@ -364,6 +402,10 @@
         #watched-grid .card .tag {
             font-size: 0.6rem;
             padding: 0.15rem 0.4rem;
+        }
+
+        #watched-grid .move-actions {
+            padding: 0 0.75rem 0.75rem;
         }
 
         .delete-btn {
@@ -1104,6 +1146,19 @@
         }
 
         function renderCard(item, section, index) {
+            const sectionLabels = {
+                watching: 'Watching',
+                hopper: 'Hopper',
+                watched: 'Watched'
+            };
+            const moveButtons = ['watching', 'hopper', 'watched']
+                .filter(target => target !== section)
+                .map(target => `
+                    <button type="button" class="move-btn move-${target}"
+                            onclick="moveItem(event, '${section}', ${index}, '${target}')">
+                        ${sectionLabels[target]}
+                    </button>
+                `).join('');
             const imageHtml = item.image
                 ? `<img class="card-image" src="${item.image}" alt="${item.name}" onerror="this.outerHTML='<div class=\\'card-image placeholder\\'>🎬</div>'">`
                 : `<div class="card-image placeholder">🎬</div>`;
@@ -1129,6 +1184,9 @@
                     <button class="delete-btn" onclick="deleteItem(event, '${section}', ${index})">×</button>
                     <button class="delete-btn" style="right:36px;color:#a0a8ff;" onclick="editItem(event, '${section}', ${index})">✎</button>
                     ${cardLink}
+                    <div class="move-actions" aria-label="Move item">
+                        ${moveButtons}
+                    </div>
                 </div>
             `;
         }
@@ -1383,6 +1441,21 @@
                 render();
                 setupDropZones();
             }
+        }
+
+        function moveItem(event, fromSection, index, targetSection) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (fromSection === targetSection || !data[fromSection] || !data[targetSection]) return;
+
+            const item = data[fromSection].splice(index, 1)[0];
+            if (!item) return;
+
+            data[targetSection].push(item);
+            saveToFirebase();
+            render();
+            setupDropZones();
         }
 
         function setupDropZones() {
